@@ -453,5 +453,6 @@ int main(int argc, char* argv[])
 	UG_LOG("done." << endl);
 
 	UGFinalize();
+	return 0;
 }
 
