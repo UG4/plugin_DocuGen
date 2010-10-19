@@ -285,7 +285,7 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 {
 	fstream hierarchyhtml((string(dir).append("hierarchy.html")).c_str(), ios::out);
 	WriteHeader(hierarchyhtml, "Class Hierarchy");
-	hierarchyhtml << "<h1>ug4 Class Hierarchy</h1>This inheritance list is not sorted:<ul>" << endl;
+	hierarchyhtml << "<h1>ugbridge Class Hierarchy (ug4)</h1>This inheritance list is not sorted:<ul>" << endl;
 	for(size_t i=0; i<hierarchy.subclasses.size(); i++)
 		WriteClassHierarchy(hierarchyhtml, hierarchy.subclasses[i]);
 	hierarchyhtml << "</ul>"<<endl;
