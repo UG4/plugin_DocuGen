@@ -16,6 +16,7 @@
 #include "ug.h"
 
 #include "ug_script/ug_script.h"
+#include "ug_bridge/class_helper.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -23,6 +24,7 @@
 using namespace std;
 using namespace ug;
 using namespace bridge;
+
 
 // to refresh this file, use   xxd -i ugdocu.css > ugdocu.css.h
 #include "ugdocu.css.h";
@@ -38,12 +40,6 @@ extern const IExportedClass *FindClass(const char* classname);
 
 } // namespace ug
 
-
-struct ClassHierarchy
-{
-	string name;
-	vector<ClassHierarchy> subclasses;
-};
 
 
 string tohtmlstring(const string &str)
@@ -112,15 +108,37 @@ bool ParameterToHTMLString(fstream &file, const bridge::ParameterStack &par, int
 	return false;
 }
 
-bool WriteParameters(fstream &file, const bridge::ParameterStack &par)
+bool WriteParametersIn(fstream &file, const bridge::ExportedFunctionBase &thefunc)
 {
 	file << "(";
-	for(int i=0; i<par.size(); ++i)
+	for(size_t i=0; i < (size_t)thefunc.params_in().size(); ++i)
 	{
 		if(i>0) file << ", ";
-		ParameterToHTMLString(file, par, i);
+		ParameterToHTMLString(file, thefunc.params_in(), i);
+		if(i<thefunc.num_parameter())
+			file << " " << thefunc.parameter_name(i);
 	}
 	file << ")";
+	return true;
+}
+
+bool WriteParametersOut(fstream &file, const bridge::ExportedFunctionBase &thefunc)
+{
+	if(thefunc.params_out().size() == 1)
+	{
+		ParameterToHTMLString(file, thefunc.params_out(), 0);
+		//file << " " << thefunc.return_name();
+	}
+	else if(thefunc.params_out().size() > 1)
+	{
+		file << "(";
+		for(int i=0; i < thefunc.params_out().size(); ++i)
+		{
+			if(i>0) file << ", ";
+			ParameterToHTMLString(file, thefunc.params_out(), i);
+		}
+		file << ")";
+	}
 	return true;
 }
 
@@ -128,9 +146,7 @@ void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefun
 		const IExportedClass *c = NULL, bool bConst = false)
 {
 	file << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
-	const bridge::ParameterStack &parout = thefunc.params_out();
-	if(parout.size() > 0)
-		WriteParameters(file, parout);
+	WriteParametersOut(file, thefunc);
 
 	file << "</td><td class=\"memItemRight\" valign=bottom>";
 	if(bConst)
@@ -140,51 +156,10 @@ void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefun
 
 	file << thefunc.name() << " ";
 
-	WriteParameters(file, thefunc.params_in());
+	WriteParametersIn(file, thefunc);
 	file << "</td></tr>" << endl;
 }
 
-void InsertClass(ClassHierarchy &classes, const IExportedClass &c)
-{
-	const vector<const char *> *pNames = c.class_names();
-
-	if(pNames == NULL) return;
-
-	ClassHierarchy *base = &classes;
-
-	for(vector<const char*>::const_reverse_iterator rit = pNames->rbegin(); rit < pNames->rend(); ++rit)
-	{
-		const char *thename = (*rit);
-		size_t j;
-		for(j=0; j<base->subclasses.size(); j++)
-		{
-			if(base->subclasses.at(j).name.compare(thename) == 0)
-			{
-				base = &base->subclasses.at(j);
-				break;
-			}
-		}
-
-		if(j == base->subclasses.size())
-		{
-			ClassHierarchy newclass;
-			newclass.name = thename;
-			base->subclasses.push_back(newclass);
-		}
-	}
-}
-
-ClassHierarchy *FindClassInHierarchy(ClassHierarchy &classes, const char *name)
-{
-	if(classes.name.compare(name) == 0)
-		return &classes;
-	for(size_t i=0; i<classes.subclasses.size(); i++)
-	{
-		ClassHierarchy *c = FindClassInHierarchy(classes.subclasses[i], name);
-		if(c) return c;
-	}
-	return NULL;
-}
 
 void WriteClassHierarchy(fstream &file, ClassHierarchy &c)
 {
@@ -271,15 +246,6 @@ void WriteUGDocuCSS(const char *dir)
 }
 
 
-void GetClassHierarchy(ClassHierarchy &hierarchy)
-{
-	hierarchy.subclasses.clear();
-	hierarchy.name = "UGBase";
-	bridge::Registry &reg = GetUGRegistry();
-	for(size_t i=0; i<reg.num_classes(); ++i)
-		InsertClass(hierarchy, reg.get_class(i));
-}
-
 // print class hierarchy in hierarchy.html
 void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 {
@@ -355,7 +321,7 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 	classhtml << "</table>" << endl;
 
 	// print subclasses of this class
-	ClassHierarchy *theclass = FindClassInHierarchy(hierarchy, name.c_str());
+	ClassHierarchy *theclass = hierarchy.find_class(name.c_str());
 	if(theclass && theclass->subclasses.size() > 0)
 	{
 		classhtml 	<< "<h1>Subclasses</h1><ul>" << endl;
@@ -434,7 +400,7 @@ int main(int argc, char* argv[])
 	// print class hierarchy in hierarchy.html
 	ClassHierarchy hierarchy;
 	UG_LOG("GetClassHierarchy... ")
-	GetClassHierarchy(hierarchy);
+	GetClassHierarchy(hierarchy, GetUGRegistry());
 
 	UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_classes() << " total. " << endl);
 	UG_LOG("WriteClassHierarchy... ");
