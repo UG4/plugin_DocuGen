@@ -329,6 +329,11 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 		classhtml << "</ul>";
 	}
 
+	// write doxygen
+	// search in annotated.html for amg< or amg&lt, use the html file
+	//<tr><td class="indexkey"><a class="el" href="classug_1_1_function_pattern.html">ug::FunctionPattern</a></td><td class="indexvalue"></td></tr>
+
+
 	WriteFooter(classhtml);
 }
 
@@ -371,6 +376,8 @@ void WriteGlobalFunctions(const char *dir)
 	UG_LOG(reg.num_functions() << " functions written." << endl);
 }
 
+bool InitAlgebra(AlgebraTypeChooserInterface *algebra_type);
+
 int main(int argc, char* argv[])
 {
 	UGInit(argc, argv, 0);
@@ -392,6 +399,11 @@ int main(int argc, char* argv[])
 	const char *dir = argv[dirParamIndex+1];
 	LOG("Writing html files to \"" << dir << "\"" << endl);
 
+	// init registry with cpualgebra
+	CPUAlgebraChooser algebra;
+	InitAlgebra(&algebra);
+
+	// get registry
 	bridge::Registry &reg = GetUGRegistry();
 
 
