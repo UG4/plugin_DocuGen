@@ -14,6 +14,6 @@ include("../../ug_cmake_includes.txt")
 
 set(srcUGDocu	    src/main.cpp)
 
-target_link_libraries (testsuite ug)
+target_link_libraries (ugdocu ug)
 
 add_executable(ugdocu ${srcUGDocu})
