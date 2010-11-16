@@ -27,9 +27,9 @@ using namespace bridge;
 
 
 // to refresh this file, use   xxd -i ugdocu.css > ugdocu.css.h
-#include "ugdocu.css.h";
+#include "ugdocu.css.h"
 
-namespace ug{
+namespace ug {
 
 namespace bridge
 {
