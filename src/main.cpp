@@ -242,6 +242,7 @@ void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInher
 }
 
 // write the ugdocu.css
+//TODO: make sure dir exists and is writeable!
 void WriteUGDocuCSS(const char *dir)
 {
 	UG_LOG("WriteUGDocuCSS... ");
