@@ -459,13 +459,12 @@ int main(int argc, char* argv[])
 	const char *dir = argv[dirParamIndex+1];
 	LOG("Writing html files to \"" << dir << "\"" << endl);
 
-	// init registry with cpualgebra
-	CPUAlgebraChooser algebra;
-	InitAlgebra(&algebra);
-
 	// get registry
 	Registry &reg = GetUGRegistry();
 
+	// init registry with cpualgebra
+	CPUAlgebraChooser algebra;
+	InitAlgebra(&algebra);
 
 	WriteUGDocuCSS(dir);
 
