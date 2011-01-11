@@ -185,7 +185,7 @@ void WriteClassHierarchy(fstream &file, ClassHierarchy &c)
  */
 bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParameters)
 {
-	bridge::Registry &reg = ug::bridge::GetUGRegistry();
+	Registry &reg = GetUGRegistry();
 	// check functions
 	for(size_t i=0; i<reg.num_functions(); i++)
 	{
@@ -267,6 +267,8 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 // write html file for a class
 void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierarchy)
 {
+	Registry &reg = GetUGRegistry();
+
 	string name = c.name();
 
 	fstream classhtml((string(dir) + name + ".html").c_str(), ios::out);
@@ -299,7 +301,7 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 	{
 		// print inherited member functions
 		for(size_t i=1; i<pNames->size(); i++)
-			PrintClassFunctionsHMTL(classhtml, FindClass(pNames->at(i)), true);
+			PrintClassFunctionsHMTL(classhtml, FindClass(reg, pNames->at(i)), true);
 	}
 
 	classhtml << "</table>" << endl;
@@ -349,7 +351,7 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 void WriteClassIndex(const char *dir)
 {
 	UG_LOG("WriteClassIndex... ");
-	bridge::Registry &reg = ug::bridge::GetUGRegistry();
+	Registry &reg = GetUGRegistry();
 
 	vector<string> class_names;
 	for(size_t i=0; i<reg.num_classes(); ++i)
@@ -369,7 +371,7 @@ void WriteClassIndex(const char *dir)
 
 
 		indexhtml << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
-		const IExportedClass *c = FindClass(class_names[i].c_str());
+		const IExportedClass *c = FindClass(reg, class_names[i].c_str());
 		if(c)
 			indexhtml << c->group();
 
@@ -388,7 +390,7 @@ void WriteClassIndex(const char *dir)
 void WriteGroupClassIndex(const char *dir)
 {
 	UG_LOG("WriteGroupClassIndex... ");
-	bridge::Registry &reg = ug::bridge::GetUGRegistry();
+	Registry &reg = GetUGRegistry();
 
 	vector<string> class_names;
 	for(size_t i=0; i<reg.num_classes(); ++i)
@@ -416,7 +418,7 @@ void WriteGroupClassIndex(const char *dir)
 void WriteGlobalFunctions(const char *dir)
 {
 	UG_LOG("WriteGlobalFunctions...");
-	bridge::Registry &reg = ug::bridge::GetUGRegistry();
+	Registry &reg = GetUGRegistry();
 
 	fstream funchtml((string(dir).append("functions.html")).c_str(), ios::out);
 	WriteHeader(funchtml, "Global Functions Index");
@@ -459,10 +461,10 @@ int main(int argc, char* argv[])
 
 	// init registry with cpualgebra
 	CPUAlgebraChooser algebra;
-	ug::bridge::InitAlgebra(&algebra);
+	InitAlgebra(&algebra);
 
 	// get registry
-	bridge::Registry &reg = ug::bridge::GetUGRegistry();
+	Registry &reg = GetUGRegistry();
 
 
 	WriteUGDocuCSS(dir);
@@ -470,7 +472,7 @@ int main(int argc, char* argv[])
 	// print class hierarchy in hierarchy.html
 	ClassHierarchy hierarchy;
 	UG_LOG("GetClassHierarchy... ");
-	GetClassHierarchy(hierarchy, ug::bridge::GetUGRegistry());
+	GetClassHierarchy(hierarchy, reg);
 
 	UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_classes() << " total. " << endl);
 	UG_LOG("WriteClassHierarchy... ");
