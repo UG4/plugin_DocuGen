@@ -202,8 +202,8 @@ bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParamete
 		for(size_t i=0; i<c.num_methods(); i++)
 		{
 			const bridge::ExportedFunctionBase &thefunc = c.get_method(i);
-			if(!OutParameters && IsClassInParameters(thefunc.params_in(), classname) ||
-					OutParameters && IsClassInParameters(thefunc.params_out(), classname))
+			if((!OutParameters && IsClassInParameters(thefunc.params_in(), classname)) ||
+					(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
 				WriteFunctionInfo(file, thefunc, &c, false);
 
 		}
@@ -211,8 +211,8 @@ bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParamete
 		for(size_t i=0; i<c.num_const_methods(); i++)
 		{
 			const bridge::ExportedFunctionBase &thefunc = c.get_const_method(i);
-			if(!OutParameters && IsClassInParameters(thefunc.params_in(), classname) ||
-					OutParameters && IsClassInParameters(thefunc.params_out(), classname))
+			if((!OutParameters && IsClassInParameters(thefunc.params_in(), classname)) ||
+					(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
 				WriteFunctionInfo(file, thefunc, &c, true);
 		}
 	}
