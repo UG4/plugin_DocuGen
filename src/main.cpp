@@ -440,7 +440,7 @@ bool InitAlgebra(AlgebraTypeChooserInterface *algebra_type);
 
 int main(int argc, char* argv[])
 {
-	UGInit(argc, argv, 0);
+	UGInit(&argc, &argv, 0);
 
 	LOG("****************************************************************\n");
 	LOG("* ugdocu - v0.1.0\n");
