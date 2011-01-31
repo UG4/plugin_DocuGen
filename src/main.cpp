@@ -190,8 +190,8 @@ bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParamete
 	for(size_t i=0; i<reg.num_functions(); i++)
 	{
 		const bridge::ExportedFunctionBase &thefunc = reg.get_function(i);
-		if(!OutParameters && IsClassInParameters(thefunc.params_in(), classname) ||
-				OutParameters && IsClassInParameters(thefunc.params_out(), classname))
+		if((!OutParameters && IsClassInParameters(thefunc.params_in(), classname)) ||
+				(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
 			WriteFunctionInfo(file, thefunc);
 	}
 
