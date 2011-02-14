@@ -140,6 +140,10 @@ bool WriteParametersOut(fstream &file, const bridge::ExportedFunctionBase &thefu
 		}
 		file << ")";
 	}
+	else
+	{
+		file << "void";
+	}
 	return true;
 }
 
@@ -159,6 +163,24 @@ void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefun
 
 	WriteParametersIn(file, thefunc);
 	file << "</td></tr>" << endl;
+
+	if(thefunc.return_name().size() > 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+				file << "returns " << thefunc.return_name() << "<br/></td></tr>" << endl;
+	}
+
+	if(thefunc.tooltip().size() > 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>" << endl;
+	}
+
+	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+		file << "help: " << thefunc.help() << "<br/></td></tr>" << endl;
+	}
 }
 
 
