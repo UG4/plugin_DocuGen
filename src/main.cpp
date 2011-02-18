@@ -279,7 +279,7 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 {
 	fstream hierarchyhtml((string(dir).append("hierarchy.html")).c_str(), ios::out);
 	WriteHeader(hierarchyhtml, "Class Hierarchy");
-	hierarchyhtml << "<h1>ugbridge Class Hierarchy (ug4)</h1>This inheritance list is not sorted:<ul>" << endl;
+	hierarchyhtml << "<h1>ugbridge Class Hierarchy (ug4)</h1>This inheritance list sorted hierarchically:<ul>" << endl;
 	for(size_t i=0; i<hierarchy.subclasses.size(); i++)
 		WriteClassHierarchy(hierarchyhtml, hierarchy.subclasses[i]);
 	hierarchyhtml << "</ul>"<<endl;
@@ -298,7 +298,7 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 
 	classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
 
-	classhtml << "<br>Group" << c.group() << "<br>" << endl;
+	classhtml << "<br>Group <b>" << c.group() << "</b><br>" << endl;
 
 	// print parent classes
 	const vector<const char *> *pNames = c.class_names();
@@ -369,16 +369,22 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 	WriteFooter(classhtml);
 }
 
+bool ExportedClassSort(const IExportedClass *i, const IExportedClass *j)
+{
+	return strcmp(i->name(), j->name()) < 0;
+}
+
+
 // write alphabetical class index in index.html
 void WriteClassIndex(const char *dir)
 {
 	UG_LOG("WriteClassIndex... ");
 	Registry &reg = GetUGRegistry();
 
-	vector<string> class_names;
+	vector<const IExportedClass *> sortedClasses;
 	for(size_t i=0; i<reg.num_classes(); ++i)
-		class_names.push_back(reg.get_class(i).name());
-	sort(class_names.begin(), class_names.end());
+		sortedClasses.push_back(&reg.get_class(i));
+	sort(sortedClasses.begin(), sortedClasses.end(), ExportedClassSort);
 
 
 	fstream indexhtml((string(dir).append("index.html")).c_str(), ios::out);
@@ -388,24 +394,21 @@ void WriteClassIndex(const char *dir)
 
 	indexhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
 					<< "<tr><td></td></tr>" << endl;
-	for(size_t i=0; i<class_names.size(); i++)
+	for(size_t i=0; i<sortedClasses.size(); i++)
 	{
-
-
 		indexhtml << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
-		const IExportedClass *c = FindClass(reg, class_names[i].c_str());
+		const IExportedClass *c = sortedClasses[i];
 		if(c)
 			indexhtml << c->group();
-
 		indexhtml << "</td>" << endl;
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
-		indexhtml << "<a class=\"el\" href=\"" << class_names[i] << ".html\">" << class_names[i] << "</a>";
+		indexhtml << "<a class=\"el\" href=\"" << c->name() << ".html\">" << c->name() << "</a>";
 		indexhtml << "</td></tr>" << endl;
 	}
 
 	indexhtml 	<< "</table>" << endl;
 	WriteFooter(indexhtml);
-	UG_LOG(class_names.size() << " class names written. " << endl);
+	UG_LOG(sortedClasses.size() << " class names written. " << endl);
 }
 
 // write alphabetical class index in index.html
@@ -436,18 +439,29 @@ void WriteGroupClassIndex(const char *dir)
 	UG_LOG(class_names.size() << " class names written. " << endl);
 }
 
+bool ExportedFunctionsSort(const bridge::ExportedFunctionBase * i,
+		const bridge::ExportedFunctionBase *j)
+{
+	return i->name() < j->name();
+}
+
 // write functions index (functions.html). todo: sort alphabetically
 void WriteGlobalFunctions(const char *dir)
 {
 	UG_LOG("WriteGlobalFunctions...");
 	Registry &reg = GetUGRegistry();
 
+	std::vector<bridge::ExportedFunctionBase *> sortedFunctions;
+	for(size_t i=0; i<reg.num_functions(); i++)
+		sortedFunctions.push_back(&reg.get_function(i));
+	sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
+
 	fstream funchtml((string(dir).append("functions.html")).c_str(), ios::out);
 	WriteHeader(funchtml, "Global Functions Index");
 	funchtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
 				<< "<tr><td></td></tr>" << endl;
-	for(size_t i=0; i<reg.num_functions(); i++)
-		WriteFunctionInfo(funchtml, reg.get_function(i));
+	for(size_t i=0; i<sortedFunctions.size(); i++)
+		WriteFunctionInfo(funchtml, *sortedFunctions[i]);
 	funchtml 	<< "</table>" << endl;
 	WriteFooter(funchtml);
 	UG_LOG(reg.num_functions() << " functions written." << endl);
