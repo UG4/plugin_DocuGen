@@ -493,7 +493,7 @@ bool ExportedFunctionsGroupSort(const bridge::ExportedFunction * i,
 // write functions index (functions.html). todo: sort alphabetically
 void WriteGlobalFunctions(const char *dir, const char *filename, bool sortFunction(const bridge::ExportedFunction * i, const bridge::ExportedFunction *j))
 {
-	UG_LOG("WriteGroupGlobalFunctions...");
+	UG_LOG("WriteGlobalFunctions (" << filename << ") ...");
 	Registry &reg = GetUGRegistry();
 
 	std::vector<const bridge::ExportedFunction *> sortedFunctions;
@@ -505,7 +505,7 @@ void WriteGlobalFunctions(const char *dir, const char *filename, bool sortFuncti
 	}
 	sort(sortedFunctions.begin(), sortedFunctions.end(), sortFunction);
 
-	fstream funchtml((string(dir).append("groupedfunctions.html")).c_str(), ios::out);
+	fstream funchtml((string(dir).append(filename)).c_str(), ios::out);
 	WriteHeader(funchtml, "Global Functions Index by Group");
 	funchtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
 				<< "<tr><td></td></tr>" << endl;
