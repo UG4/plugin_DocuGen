@@ -59,6 +59,7 @@ void WriteHeader(fstream &file, const string &title)
 	file << " | <a class=\"qindex\" href=\"index.html\">Class Index</a>";
 	file << " | <a class=\"qindex\" href=\"groupindex.html\">Class Index by Group</a>";
 	file << " | <a class=\"qindex\" href=\"functions.html\">Global Functions</a>";
+	file << " | <a class=\"qindex\" href=\"groupedfunctions.html\">Global Functions by Group</a>";
 	file << "</div>" << endl;
 }
 
@@ -182,6 +183,41 @@ void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefun
 		file << "help: " << thefunc.help() << "<br/></td></tr>" << endl;
 	}
 }
+
+
+void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefunc,
+		const char *group)
+{
+	file << "<tr>";
+	file << "<td class=\"mdescLeft\">" << group << "</td>";
+	file << "<td class=\"memItemLeft\" nowrap align=right valign=top>";
+	WriteParametersOut(file, thefunc);
+
+	file << "</td><td class=\"memItemRight\" valign=bottom>";
+	file << thefunc.name() << " ";
+
+	WriteParametersIn(file, thefunc);
+	file << "</td></tr>" << endl;
+
+	if(thefunc.return_name().size() > 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+				file << "returns " << thefunc.return_name() << "<br/></td></tr>" << endl;
+	}
+
+	if(thefunc.tooltip().size() > 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>" << endl;
+	}
+
+	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
+	{
+		file << "<tr><<td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+		file << "help: " << thefunc.help() << "<br/></td></tr>" << endl;
+	}
+}
+
 
 
 void WriteClassHierarchy(fstream &file, ClassHierarchy &c)
@@ -439,33 +475,47 @@ void WriteGroupClassIndex(const char *dir)
 	UG_LOG(class_names.size() << " class names written. " << endl);
 }
 
-bool ExportedFunctionsSort(const bridge::ExportedFunctionBase * i,
-		const bridge::ExportedFunctionBase *j)
+bool ExportedFunctionsSort(const bridge::ExportedFunction * i,
+		const bridge::ExportedFunction *j)
 {
 	return i->name() < j->name();
 }
+bool ExportedFunctionsGroupSort(const bridge::ExportedFunction * i,
+		const bridge::ExportedFunction *j)
+{
+	int c = i->group().compare(j->group());
+	if(c == 0)
+		return i->name() < j->name();
+	else
+		return c < 0;
+}
 
 // write functions index (functions.html). todo: sort alphabetically
-void WriteGlobalFunctions(const char *dir)
+void WriteGlobalFunctions(const char *dir, const char *filename, bool sortFunction(const bridge::ExportedFunction * i, const bridge::ExportedFunction *j))
 {
-	UG_LOG("WriteGlobalFunctions...");
+	UG_LOG("WriteGroupGlobalFunctions...");
 	Registry &reg = GetUGRegistry();
 
-	std::vector<bridge::ExportedFunctionBase *> sortedFunctions;
+	std::vector<const bridge::ExportedFunction *> sortedFunctions;
 	for(size_t i=0; i<reg.num_functions(); i++)
-		sortedFunctions.push_back(&reg.get_function(i));
-	sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
+	{
+		ExportedFunctionGroup &fu = reg.get_function_group(i);
+		for(size_t j=0; j<fu.num_overloads(); j++)
+			sortedFunctions.push_back(fu.get_overload(j));
+	}
+	sort(sortedFunctions.begin(), sortedFunctions.end(), sortFunction);
 
-	fstream funchtml((string(dir).append("functions.html")).c_str(), ios::out);
-	WriteHeader(funchtml, "Global Functions Index");
+	fstream funchtml((string(dir).append("groupedfunctions.html")).c_str(), ios::out);
+	WriteHeader(funchtml, "Global Functions Index by Group");
 	funchtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
 				<< "<tr><td></td></tr>" << endl;
 	for(size_t i=0; i<sortedFunctions.size(); i++)
-		WriteFunctionInfo(funchtml, *sortedFunctions[i]);
+		WriteFunctionInfo(funchtml, *sortedFunctions[i], sortedFunctions[i]->group().c_str());
 	funchtml 	<< "</table>" << endl;
 	WriteFooter(funchtml);
 	UG_LOG(reg.num_functions() << " functions written." << endl);
 }
+
 
 namespace ug
 {
@@ -524,7 +574,9 @@ int main(int argc, char* argv[])
 
 	WriteGroupClassIndex(dir);
 
-	WriteGlobalFunctions(dir);
+	WriteGlobalFunctions(dir, "functions.html", ExportedFunctionsSort);
+	WriteGlobalFunctions(dir, "groupedfunctions.html", ExportedFunctionsGroupSort);
+
 	UG_LOG("done." << endl);
 
 	UGFinalize();
