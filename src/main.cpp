@@ -14,6 +14,7 @@
 #include <string>
 
 #include "ug.h"
+#include "ugbase.h"
 
 #include "ug_script/ug_script.h"
 #include "ug_bridge/class_helper.h"
