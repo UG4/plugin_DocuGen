@@ -550,7 +550,7 @@ int main(int argc, char* argv[])
 	Registry &reg = GetUGRegistry();
 
 	// init registry with cpualgebra
-	CPUAlgebraChooser algebra;
+	CPUAlgebraSelector algebra;
 	InitAlgebra(&algebra);
 
 	WriteUGDocuCSS(dir);
