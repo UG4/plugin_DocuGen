@@ -18,7 +18,7 @@
 
 #include "ug_script/ug_script.h"
 #include "ug_bridge/class_helper.h"
-
+#include "common/util/parameter_parsing.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -41,6 +41,26 @@ extern const IExportedClass *FindClass(const char* classname);
 
 } // namespace ug
 
+
+bool ExportedClassSort(const IExportedClass *i, const IExportedClass *j)
+{
+	return strcmp(i->name(), j->name()) < 0;
+}
+
+bool ExportedFunctionsSort(const bridge::ExportedFunctionBase * i,
+		const bridge::ExportedFunctionBase *j)
+{
+	return i->name() < j->name();
+}
+bool ExportedFunctionsGroupSort(const bridge::ExportedFunction * i,
+		const bridge::ExportedFunction *j)
+{
+	int c = i->group().compare(j->group());
+	if(c == 0)
+		return i->name() < j->name();
+	else
+		return c < 0;
+}
 
 
 string tohtmlstring(const string &str)
@@ -260,19 +280,27 @@ bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParamete
 		const IExportedClass &c = reg.get_class(i);
 		for(size_t i=0; i<c.num_methods(); i++)
 		{
-			const bridge::ExportedFunctionBase &thefunc = c.get_method(i);
-			if((!OutParameters && IsClassInParameters(thefunc.params_in(), classname)) ||
-					(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
-				WriteFunctionInfo(file, thefunc, &c, false);
+			const ExportedMethodGroup &grp = c.get_method_group(i);
+			for(size_t j=0; j< grp.num_overloads(); j++)
+			{
+				const bridge::ExportedMethod *thefunc = grp.get_overload(j);
+				if((!OutParameters && IsClassInParameters(thefunc->params_in(), classname)) ||
+						(OutParameters && IsClassInParameters(thefunc->params_out(), classname)))
+					WriteFunctionInfo(file, *thefunc, &c, false);
+			}
 
 		}
 
 		for(size_t i=0; i<c.num_const_methods(); i++)
 		{
-			const bridge::ExportedFunctionBase &thefunc = c.get_const_method(i);
-			if((!OutParameters && IsClassInParameters(thefunc.params_in(), classname)) ||
-					(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
-				WriteFunctionInfo(file, thefunc, &c, true);
+			const ExportedMethodGroup &grp = c.get_const_method_group(i);
+			for(size_t j=0; j< grp.num_overloads(); j++)
+			{
+				const bridge::ExportedMethod *thefunc = grp.get_overload(j);
+				if((!OutParameters && IsClassInParameters(thefunc->params_in(), classname)) ||
+						(OutParameters && IsClassInParameters(thefunc->params_out(), classname)))
+					WriteFunctionInfo(file, *thefunc, &c, true);
+			}
 		}
 	}
 	return true;
@@ -282,21 +310,39 @@ void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInher
 {
 	if(c->num_methods() > 0)
 	{
+		std::vector<const bridge::ExportedFunctionBase *> sortedFunctions;
+		for(size_t i=0; i<c->num_methods(); ++i)
+		{
+			const ExportedMethodGroup &grp = c->get_method_group(i);
+			for(size_t j=0; j<grp.num_overloads(); j++)
+				sortedFunctions.push_back(grp.get_overload(j));
+		}
+		sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
+
 		file << "<tr><td colspan=2><br><h2>";
 		if(bInherited) file << " Inherited ";
 		file << c->name() << " Member Functions</h2></td></tr>" << endl;
-		for(size_t k=0; k<c->num_methods(); ++k)
-			WriteFunctionInfo(file, c->get_method(k));
+		for(size_t i=0; i < sortedFunctions.size(); ++i)
+			WriteFunctionInfo(file, *sortedFunctions[i]);
 	}
 
 	if(c->num_const_methods() > 0)
 	{
+		std::vector<const bridge::ExportedFunctionBase *> sortedFunctions;
+		for(size_t i=0; i<c->num_const_methods(); ++i)
+		{
+			const ExportedMethodGroup &grp = c->get_const_method_group(i);
+			for(size_t j=0; j<grp.num_overloads(); j++)
+				sortedFunctions.push_back(grp.get_overload(j));
+		}
+		sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
+
 		file << "<tr><td colspan=2><br><h2>";
 		if(bInherited) file << " Inherited ";
 		file << c->name() << " Const Member Functions</h2></td></tr>" << endl;
 
-		for(size_t k=0; k<c->num_const_methods(); ++k)
-			WriteFunctionInfo(file, c->get_const_method(k));
+		for(size_t i=0; i < sortedFunctions.size(); ++i)
+			WriteFunctionInfo(file, *sortedFunctions[i]);
 	}
 }
 
@@ -334,6 +380,11 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 	WriteHeader(classhtml, name);
 
 	classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
+
+	if(c.is_instantiable())
+		classhtml << "class has constructor<br>";
+	else
+		classhtml << "class has no constructor<br>";
 
 	classhtml << "<br>Group <b>" << c.group() << "</b><br>" << endl;
 
@@ -406,12 +457,6 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 	WriteFooter(classhtml);
 }
 
-bool ExportedClassSort(const IExportedClass *i, const IExportedClass *j)
-{
-	return strcmp(i->name(), j->name()) < 0;
-}
-
-
 // write alphabetical class index in index.html
 void WriteClassIndex(const char *dir)
 {
@@ -476,23 +521,11 @@ void WriteGroupClassIndex(const char *dir)
 	UG_LOG(class_names.size() << " class names written. " << endl);
 }
 
-bool ExportedFunctionsSort(const bridge::ExportedFunction * i,
-		const bridge::ExportedFunction *j)
-{
-	return i->name() < j->name();
-}
-bool ExportedFunctionsGroupSort(const bridge::ExportedFunction * i,
-		const bridge::ExportedFunction *j)
-{
-	int c = i->group().compare(j->group());
-	if(c == 0)
-		return i->name() < j->name();
-	else
-		return c < 0;
-}
 
-// write functions index (functions.html). todo: sort alphabetically
-void WriteGlobalFunctions(const char *dir, const char *filename, bool sortFunction(const bridge::ExportedFunction * i, const bridge::ExportedFunction *j))
+// write functions index
+template<typename TSortFunction>
+void WriteGlobalFunctions(const char *dir, const char *filename,
+		TSortFunction sortFunction)
 {
 	UG_LOG("WriteGlobalFunctions (" << filename << ") ...");
 	Registry &reg = GetUGRegistry();
@@ -522,7 +555,7 @@ namespace ug
 {
 namespace bridge
 {
-bool InitAlgebra(AlgebraTypeChooserInterface *algebra_type);
+bool InitAlgebra(IAlgebraTypeSelector *algebra_type);
 }}
 
 int main(int argc, char* argv[])
