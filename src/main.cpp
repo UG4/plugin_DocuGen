@@ -262,16 +262,20 @@ void WriteClassHierarchy(fstream &file, ClassHierarchy &c)
  *
  * \param classname the class (and only this class) to print usage in functions/member functions of.
  */
-bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParameters)
+bool WriteClassUsageExact(const string &preamble, fstream &file, const char *classname, bool OutParameters)
 {
 	Registry &reg = GetUGRegistry();
+	bool bPreambleWritten = false;
 	// check functions
 	for(size_t i=0; i<reg.num_functions(); i++)
 	{
 		const bridge::ExportedFunctionBase &thefunc = reg.get_function(i);
 		if((!OutParameters && IsClassInParameters(thefunc.params_in(), classname)) ||
 				(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
+		{
+			if(bPreambleWritten==false) { file << preamble; bPreambleWritten=true; }
 			WriteFunctionInfo(file, thefunc);
+		}
 	}
 
 	// check classes
@@ -286,7 +290,10 @@ bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParamete
 				const bridge::ExportedMethod *thefunc = grp.get_overload(j);
 				if((!OutParameters && IsClassInParameters(thefunc->params_in(), classname)) ||
 						(OutParameters && IsClassInParameters(thefunc->params_out(), classname)))
+				{
+					if(bPreambleWritten==false) { file << preamble; bPreambleWritten=true; }
 					WriteFunctionInfo(file, *thefunc, &c, false);
+				}
 			}
 
 		}
@@ -299,7 +306,10 @@ bool WriteClassUsageExact(fstream &file, const char *classname, bool OutParamete
 				const bridge::ExportedMethod *thefunc = grp.get_overload(j);
 				if((!OutParameters && IsClassInParameters(thefunc->params_in(), classname)) ||
 						(OutParameters && IsClassInParameters(thefunc->params_out(), classname)))
+				{
+					if(bPreambleWritten==false) { file << preamble; bPreambleWritten=true; }
 					WriteFunctionInfo(file, *thefunc, &c, true);
+				}
 			}
 		}
 	}
@@ -319,9 +329,9 @@ void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInher
 		}
 		sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
 
-		file << "<tr><td colspan=2><br><h2>";
-		if(bInherited) file << " Inherited ";
-		file << c->name() << " Member Functions</h2></td></tr>" << endl;
+		file << "<tr><td colspan=2><br><h3>";
+		if(bInherited) file << "Inherited ";
+		file << c->name() << " Member Functions</h3></td></tr>" << endl;
 		for(size_t i=0; i < sortedFunctions.size(); ++i)
 			WriteFunctionInfo(file, *sortedFunctions[i]);
 	}
@@ -337,9 +347,9 @@ void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInher
 		}
 		sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
 
-		file << "<tr><td colspan=2><br><h2>";
+		file << "<tr><td colspan=2><br><h3>";
 		if(bInherited) file << " Inherited ";
-		file << c->name() << " Const Member Functions</h2></td></tr>" << endl;
+		file << c->name() << " Const Member Functions</h3></td></tr>" << endl;
 
 		for(size_t i=0; i < sortedFunctions.size(); ++i)
 			WriteFunctionInfo(file, *sortedFunctions[i]);
@@ -381,10 +391,16 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 
 	classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
 
+	if(c.tooltip().size() != 0)
+	{
+
+		classhtml << "<p align=\"center\">" << c.tooltip() << "</p><br>";
+	}
 	if(c.is_instantiable())
 		classhtml << "class has constructor<br>";
 	else
 		classhtml << "class has no constructor<br>";
+
 
 	classhtml << "<br>Group <b>" << c.group() << "</b><br>" << endl;
 
@@ -418,26 +434,31 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 
 	// print usage of this class in other classes
 
-	classhtml 	<< "<h1>Usage Information</h1>" << endl;
+	classhtml 	<< "<hr> <h1>Usage Information</h1>" << endl;
 
 	classhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
 						<< "<tr><td></td></tr>" << endl;
 
 	// functions returning this class
-	classhtml 	<< "<tr><td colspan=2><br><h2> Functions returning " << name << "</h2></td></tr>" << endl;
-	WriteClassUsageExact(classhtml, name.c_str(), true);
+	string str = string("<tr><td colspan=2><br><h3> Functions returning ") + string(name) + string("</h2></td></tr>\n");
+	WriteClassUsageExact(str, classhtml, name.c_str(), true);
 
 	// functions using this class or its parents
 	if(pNames)
 	{
 		for(size_t i=0; i<pNames->size(); i++)
 		{
-			classhtml << "<tr><td colspan=2><br><h2> Functions using " << pNames->at(i) << "</h2></td></tr>" << endl;
-			WriteClassUsageExact(classhtml, pNames->at(i), false);
+			string str = string("<tr><td colspan=2><br><h3> Functions using ") + string(pNames->at(i))
+					+ string("</h2></td></tr>\n");
+			WriteClassUsageExact(str, classhtml, pNames->at(i), false);
 		}
 	}
 	else
-		WriteClassUsageExact(classhtml, name.c_str(), false);
+	{
+		string str = string("<tr><td colspan=2><br><h3> Functions using ") + string(name)
+							+ string("</h2></td></tr>\n");
+		WriteClassUsageExact(str, classhtml, name.c_str(), false);
+	}
 	classhtml << "</table>" << endl;
 
 	// print subclasses of this class
