@@ -17,7 +17,7 @@
 #include "ugbase.h"
 
 #include "ug_script/ug_script.h"
-#include "ug_bridge/class_helper.h"
+#include "registry/class_helper.h"
 #include "common/util/parameter_parsing.h"
 #include <stdio.h>
 #include <time.h>
@@ -76,7 +76,7 @@ void WriteHeader(fstream &file, const string &title)
 	file << "<link href=\"ugdocu.css\" rel=\"stylesheet\" type=\"text/css\">" << endl;
 	file << "</head><body>" << endl;
 
-	file << "<div class=\"qindex\"><a class=\"qindex\" href=\"hierarchy.html\">Class Hierarchy</a>";
+	//file << "<div class=\"qindex\"><a class=\"qindex\" href=\"hierarchy.html\">Class Hierarchy</a>";
 	file << " | <a class=\"qindex\" href=\"index.html\">Class Index</a>";
 	file << " | <a class=\"qindex\" href=\"groupindex.html\">Class Index by Group</a>";
 	file << " | <a class=\"qindex\" href=\"functions.html\">Global Functions</a>";
@@ -318,6 +318,7 @@ bool WriteClassUsageExact(const string &preamble, fstream &file, const char *cla
 
 void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInherited)
 {
+	if(c == NULL) return;
 	if(c->num_methods() > 0)
 	{
 		std::vector<const bridge::ExportedFunctionBase *> sortedFunctions;
