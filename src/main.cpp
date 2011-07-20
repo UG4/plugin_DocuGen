@@ -44,7 +44,7 @@ extern const IExportedClass *FindClass(const char* classname);
 
 bool ExportedClassSort(const IExportedClass *i, const IExportedClass *j)
 {
-	return strcmp(i->name(), j->name()) < 0;
+	return i->name().compare(j->name()) < 0;
 }
 
 bool ExportedFunctionsSort(const bridge::ExportedFunctionBase * i,
