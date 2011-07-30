@@ -18,6 +18,7 @@
 
 #include "ug_script/ug_script.h"
 #include "registry/class_helper.h"
+#include "ug_bridge/ug_bridge.h"
 #include "common/util/parameter_parsing.h"
 #include <stdio.h>
 #include <time.h>
@@ -572,14 +573,6 @@ void WriteGlobalFunctions(const char *dir, const char *filename,
 	UG_LOG(reg.num_functions() << " functions written." << endl);
 }
 
-
-namespace ug
-{
-namespace bridge
-{
-bool InitAlgebra(IAlgebraTypeSelector *algebra_type);
-}}
-
 int main(int argc, char* argv[])
 {
 	UGInit(&argc, &argv, 0);
@@ -604,9 +597,10 @@ int main(int argc, char* argv[])
 	// get registry
 	Registry &reg = GetUGRegistry();
 
-	// init registry with cpualgebra
+	// init registry with cpualgebra and dim == 2
 	CPUAlgebraSelector algebra;
-	InitAlgebra(&algebra);
+	const int dim = 2;
+	InitUG(dim, algebra);
 
 	WriteUGDocuCSS(dir);
 
