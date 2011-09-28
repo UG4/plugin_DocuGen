@@ -18,7 +18,7 @@
 
 #include "bindings/lua/ug_script.h"
 #include "registry/class_helper.h"
-#include "ug_bridge/ug_bridge.h"
+#include "bridge/ug_bridge.h"
 #include "common/util/parameter_parsing.h"
 #include <stdio.h>
 #include <time.h>
