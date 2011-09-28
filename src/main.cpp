@@ -16,7 +16,7 @@
 #include "ug.h"
 #include "ugbase.h"
 
-#include "ug_script/ug_script.h"
+#include "bindings/lua/ug_script.h"
 #include "registry/class_helper.h"
 #include "ug_bridge/ug_bridge.h"
 #include "common/util/parameter_parsing.h"
