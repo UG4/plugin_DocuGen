@@ -16,4 +16,4 @@ set(srcUGDocu	    src/main.cpp)
 
 add_executable(ugdocu ${srcUGDocu})
 
-target_link_libraries (ugdocu ug ugscript ugbridge)
+target_link_libraries (ugdocu ug4 ugscript ugbridge)
