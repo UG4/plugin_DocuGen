@@ -598,7 +598,7 @@ int main(int argc, char* argv[])
 	Registry &reg = GetUGRegistry();
 
 	// init registry with cpualgebra and dim == 2
-	CPUAlgebraSelector algebra;
+	AlgebraType algebra("CPU", 1);
 	const int dim = 2;
 	InitUG(dim, algebra);
 
