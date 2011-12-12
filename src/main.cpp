@@ -117,8 +117,12 @@ bool ParameterToHTMLString(fstream &file, const bridge::ParameterStack &par, int
 		file << "number";
 		return true;
 
-	case PT_STRING:
-		file << "string";
+	case PT_CSTRING:
+		file << "c_string";
+		return true;
+
+	case PT_STD_STRING:
+		file << "std_string";
 		return true;
 
 	case PT_POINTER:
