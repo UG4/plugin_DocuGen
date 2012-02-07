@@ -539,8 +539,10 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 		classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
 	else
 	{
-		classhtml << "<h1>" << d->group->name() << " Class Reference<h1>";
-		classhtml << "<h2>" << name << "<br>" << d->tag << "</h2>";
+		classhtml << "<h1>" << d->group->name() << " Class Reference</h1>";
+		classhtml << name << "<br>" << d->tag << "<br>";
+		if(d->group->get_default_class() == d->c)
+			classhtml << "(default implementation of group " << d->group->name() << ")<br>";
 	}
 
 	if(c.tooltip().size() != 0)
@@ -626,7 +628,12 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 		classhtml 	<< "<hr> <h1>Other Implementations of " << d->group->name() << "</h1>" << endl;
 		classhtml << "<ul>";
 		for(size_t j=0; j<d->group->num_classes(); j++)
-			classhtml << "<li><a class=\"el\" href=\"" << d->group->get_class(j)->name() << ".html\">" << GetBeautifiedTag(d->group->get_class_tag(j)) << "</a>";
+		{
+			classhtml << "<li>" << "<a class=\"el\" href=\"" << d->group->get_class(j)->name() << ".html\">" << d->group->get_class(j)->name() << "</a> (" << GetBeautifiedTag(d->group->get_class_tag(j)) << ")";
+			if(d->group->get_default_class() == d->group->get_class(j))
+				classhtml << " (default)";
+			classhtml << "\n";
+		}
 		classhtml << "</ul>";
 	}
 
@@ -672,10 +679,15 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
 		if(c.c == NULL) // group
 		{
-			indexhtml << c.name();
+			indexhtml << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->get_default_class()->name() << "</a>\n";
 			indexhtml << "<ul>";
 			for(size_t j=0; j<c.group->num_classes(); j++)
-				indexhtml << "<li><a class=\"el\" href=\"" << c.group->get_class(j)->name() << ".html\">" << GetBeautifiedTag(c.group->get_class_tag(j)) << "</a>";
+			{
+				indexhtml << "<li>" << "<a class=\"el\" href=\"" << c.group->get_class(j)->name() << ".html\">" << c.group->get_class(j)->name() << "</a> (" << GetBeautifiedTag(c.group->get_class_tag(j)) << ")";
+				if(c.group->get_default_class() == c.group->get_class(j))
+					indexhtml << " (default)";
+				indexhtml << "\n";
+			}
 			indexhtml << "</ul>";
 		}
 		else
