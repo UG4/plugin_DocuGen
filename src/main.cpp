@@ -42,6 +42,10 @@ extern const IExportedClass *FindClass(const char* classname);
 
 } // namespace ug
 
+bool ClassGroupDescSort(const ClassGroupDesc *i, const ClassGroupDesc *j)
+{
+	return i->name().compare(j->name()) < 0;
+}
 
 bool ExportedClassSort(const IExportedClass *i, const IExportedClass *j)
 {
@@ -385,23 +389,162 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 	WriteFooter(hierarchyhtml);
 }
 
-// write html file for a class
-void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierarchy)
+// < vom hoffer
+std::string replaceAll(
+		std::string target,
+		const std::string oldstr,
+		const std::string newstr) {
+
+	// no substitution necessary
+	if (oldstr == newstr) {
+		return target;
+	}
+
+	for (size_t x = target.find(oldstr); x != std::string::npos; x = target.find(oldstr, x + newstr.size())) {
+		target.erase(x, oldstr.length());
+		target.insert(x, newstr);
+	}
+
+	return target;
+}// >
+
+class UGDocuClassDescription
+{
+public:
+	UGDocuClassDescription(const IExportedClass *_c)
+	{
+		c = _c;
+		group = NULL;
+	}
+
+	UGDocuClassDescription(const ClassGroupDesc *_group)
+	{
+		group = _group;
+		c = NULL;
+	}
+
+	std::string name() const
+	{
+		if(c) return c->name();
+		else if(group) return group->name();
+		else return " ";
+	}
+
+	std::string group_str() const
+	{
+		if(c) return c->group();
+		if(group)
+		{
+			if(group->get_default_class()) return group->get_default_class()->group();
+			else if(group->num_classes() > 0) return group->get_class(0)->group();
+			else return " ";
+		}
+		else return " ";
+	}
+
+
+	const IExportedClass *c;
+	const ClassGroupDesc *group;
+	string tag;
+};
+
+bool NameSortFunction(const UGDocuClassDescription &i, const UGDocuClassDescription &j)
+{
+	return i.name().compare(j.name()) < 0;
+}
+
+bool GroupNameSortFunction(const UGDocuClassDescription &i, const UGDocuClassDescription &j)
+{
+	int c = i.group_str().compare(j.group_str());
+	if(c == 0)
+		return i.name() < j.name();
+	else
+		return c < 0;
+}
+
+string GetBeautifiedTag(string tag)
+{
+	replaceAll(tag, ";", " ");
+	return tag;
+}
+
+UGDocuClassDescription *GetUGDocuClassDescription(std::vector<UGDocuClassDescription> &classes, const IExportedClass* c)
+{
+	UGDocuClassDescription desc(c);
+	std::vector<UGDocuClassDescription>::iterator it = lower_bound(classes.begin(), classes.end(), desc, NameSortFunction);
+	if(it != classes.end() && (*it).c == c)
+		return &*it;
+	else return NULL;
+	//for(size_t i=0; i<classes.size(); i++)
+		//if(classes[i].c == c) return &classes[i];
+}
+
+void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups)
 {
 	Registry &reg = GetUGRegistry();
 
+	for(size_t i=0; i<reg.num_classes(); ++i)
+		classes.push_back(UGDocuClassDescription(&reg.get_class(i)));
+	sort(classes.begin(), classes.end(), NameSortFunction);
+
+	for(size_t i=0; i<reg.num_classes(); ++i)
+		UG_LOG(classes[i].name() << "\n");
+
+	for(size_t i=0; i<reg.num_class_groups(); ++i)
+	{
+		ClassGroupDesc *g = reg.get_class_group(i);
+
+		UG_LOG("group " << g->name() << "\n");
+		for(int j=0; j<g->num_classes(); j++)
+		{
+			UG_LOG("searching " << g->get_class(j)->name() << "\n");
+			UGDocuClassDescription *d = GetUGDocuClassDescription(classes, g->get_class(j));
+			if(d) { d->group = g; d->tag = g->get_class_tag(j);  }
+			else UG_LOG("not found.\n");
+		}
+	}
+
+	for(size_t i=0; i<classes.size(); ++i)
+	{
+		if(classes[i].group == NULL)
+			classesAndGroups.push_back(classes[i]);
+	}
+
+	for(size_t i=0; i<reg.num_class_groups(); ++i)
+		classesAndGroups.push_back(UGDocuClassDescription(reg.get_class_group(i)));
+
+	sort(classesAndGroups.begin(), classesAndGroups.end(), NameSortFunction);
+
+	for(size_t i=0; i<classesAndGroups.size(); i++)
+	{
+		UG_LOG(classesAndGroups[i].group_str() << "	" << classesAndGroups[i].name());
+		if(classesAndGroups[i].c == NULL) UG_LOG("	(group)");
+		UG_LOG("\n");
+	}
+}
+
+
+// write html file for a class
+void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
+{
+	Registry &reg = GetUGRegistry();
+
+	const IExportedClass &c = *d->c;
 	string name = c.name();
 
 	fstream classhtml((string(dir) + name + ".html").c_str(), ios::out);
 	WriteHeader(classhtml, name);
 
-	classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
+	if(d->group == NULL)
+		classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
+	else
+	{
+		classhtml << "<h1>" << d->group->name() << " Class Reference<h1>";
+		classhtml << "<h2>" << name << "<br>" << d->tag << "</h2>";
+	}
 
 	if(c.tooltip().size() != 0)
-	{
-
 		classhtml << "<p align=\"center\">" << c.tooltip() << "</p><br>";
-	}
 	if(c.is_instantiable())
 		classhtml << "class has constructor<br>";
 	else
@@ -409,6 +552,8 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 
 
 	classhtml << "<br>Group <b>" << c.group() << "</b><br>" << endl;
+
+	classhtml << "<hr>\n";
 
 	// print parent classes
 	const vector<const char *> *pNames = c.class_names();
@@ -476,6 +621,15 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 		classhtml << "</ul>";
 	}
 
+	if(d->group != NULL)
+	{
+		classhtml 	<< "<hr> <h1>Other Implementations of " << d->group->name() << "</h1>" << endl;
+		classhtml << "<ul>";
+		for(size_t j=0; j<d->group->num_classes(); j++)
+			classhtml << "<li><a class=\"el\" href=\"" << d->group->get_class(j)->name() << ".html\">" << GetBeautifiedTag(d->group->get_class_tag(j)) << "</a>";
+		classhtml << "</ul>";
+	}
+
 	// write doxygen
 	// search in annotated.html for amg< or amg&lt, use the html file
 	//<tr><td class="indexkey"><a class="el" href="classug_1_1_function_pattern.html">ug::FunctionPattern</a></td><td class="indexvalue"></td></tr>
@@ -485,39 +639,56 @@ void WriteClass(const char *dir, const IExportedClass &c, ClassHierarchy &hierar
 }
 
 // write alphabetical class index in index.html
-void WriteClassIndex(const char *dir)
+void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &classesAndGroups, bool bGroup)
 {
 	UG_LOG("WriteClassIndex... ");
 	Registry &reg = GetUGRegistry();
 
-	vector<const IExportedClass *> sortedClasses;
-	for(size_t i=0; i<reg.num_classes(); ++i)
-		sortedClasses.push_back(&reg.get_class(i));
-	sort(sortedClasses.begin(), sortedClasses.end(), ExportedClassSort);
+	fstream indexhtml((string(dir).append(bGroup ? "groupindex.html" : "index.html")).c_str(), ios::out);
 
-
-	fstream indexhtml((string(dir).append("index.html")).c_str(), ios::out);
-
-	WriteHeader(indexhtml, "Class Index");
-	indexhtml << "<h1>ug4 Class Index</h1>" << endl;
+	if(bGroup)
+	{
+		WriteHeader(indexhtml, "Class Index by Group");
+		indexhtml << "<h1>ug4 Class Index by Group</h1>" << endl;
+		sort(classesAndGroups.begin(), classesAndGroups.end(), GroupNameSortFunction);
+	}
+	else
+	{
+		WriteHeader(indexhtml, "Class Index");
+		indexhtml << "<h1>ug4 Class Index</h1>" << endl;
+		sort(classesAndGroups.begin(), classesAndGroups.end(), NameSortFunction);
+	}
 
 	indexhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
 					<< "<tr><td></td></tr>" << endl;
-	for(size_t i=0; i<sortedClasses.size(); i++)
+	for(size_t i=0; i<classesAndGroups.size(); i++)
 	{
 		indexhtml << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
-		const IExportedClass *c = sortedClasses[i];
-		if(c)
-			indexhtml << c->group();
+
+		UGDocuClassDescription &c = classesAndGroups[i];
+		indexhtml << c.group_str();
+		indexhtml << " ";
 		indexhtml << "</td>" << endl;
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
-		indexhtml << "<a class=\"el\" href=\"" << c->name() << ".html\">" << c->name() << "</a>";
+		if(c.c == NULL) // group
+		{
+			indexhtml << c.name();
+			indexhtml << "<ul>";
+			for(size_t j=0; j<c.group->num_classes(); j++)
+				indexhtml << "<li><a class=\"el\" href=\"" << c.group->get_class(j)->name() << ".html\">" << GetBeautifiedTag(c.group->get_class_tag(j)) << "</a>";
+			indexhtml << "</ul>";
+		}
+		else
+		{
+			indexhtml << "<a class=\"el\" href=\"" << c.name() << ".html\">" << c.name() << "</a>";
+		}
+
 		indexhtml << "</td></tr>" << endl;
 	}
 
 	indexhtml 	<< "</table>" << endl;
 	WriteFooter(indexhtml);
-	UG_LOG(sortedClasses.size() << " class names written. " << endl);
+	UG_LOG(classesAndGroups.size() << " class groups written. " << endl);
 }
 
 // write alphabetical class index in index.html
@@ -527,9 +698,11 @@ void WriteGroupClassIndex(const char *dir)
 	Registry &reg = GetUGRegistry();
 
 	vector<string> class_names;
-	for(size_t i=0; i<reg.num_classes(); ++i)
-		class_names.push_back(reg.get_class(i).group() + "/ " + reg.get_class(i).name());
-	sort(class_names.begin(), class_names.end());
+	for(size_t i=0; i<reg.num_class_groups(); ++i)
+	{
+		IExportedClass *c = reg.get_class_group(i)->get_default_class();
+		class_names.push_back(c->group() + "/ " + c->name());
+	}
 
 	fstream indexhtml((string(dir).append("groupindex.html")).c_str(), ios::out);
 
@@ -587,6 +760,11 @@ int main(int argc, char* argv[])
 	LOG("*   -d directory.\toutput directory for the html files\n");
 	LOG("****************************************************************\n");
 
+	std::vector<UGDocuClassDescription> classes;
+	std::vector<UGDocuClassDescription> classesAndGroups;
+
+	GetGroups(classes, classesAndGroups);
+
 	int dirParamIndex = GetParamIndex("-d", argc, argv);
 
 	if(dirParamIndex == -1)
@@ -613,7 +791,7 @@ int main(int argc, char* argv[])
 	UG_LOG("GetClassHierarchy... ");
 	GetClassHierarchy(hierarchy, reg);
 
-	UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_classes() << " total. " << endl);
+	UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
 	UG_LOG("WriteClassHierarchy... ");
 	WriteClassHierarchy(dir, hierarchy);
 
@@ -621,12 +799,12 @@ int main(int argc, char* argv[])
 	// write html file for each class
 	UG_LOG(endl << "WriteClasses... ");
 	for(size_t i=0; i<reg.num_classes(); ++i)
-		WriteClass(dir, reg.get_class(i), hierarchy);
+		WriteClass(dir, GetUGDocuClassDescription(classes, &reg.get_class(i)), hierarchy);
 	UG_LOG(reg.num_classes() << " classes written." << endl);
 
-	WriteClassIndex(dir);
-
-	WriteGroupClassIndex(dir);
+	WriteClassIndex(dir, classesAndGroups, false);
+	WriteClassIndex(dir, classesAndGroups, true);
+	//WriteGroupClassIndex(dir, classesAndGroups);
 
 	WriteGlobalFunctions(dir, "functions.html", ExportedFunctionsSort);
 	WriteGlobalFunctions(dir, "groupedfunctions.html", ExportedFunctionsGroupSort);
