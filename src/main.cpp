@@ -28,7 +28,7 @@ using namespace ug;
 using namespace bridge;
 
 
-// to refresh this file, use   xxd -i ugdocu.css > ugdocu.css.h
+// to refresh this file, use xxd -i ugdocu.css > ugdocu.css.h
 #include "ugdocu.css.h"
 
 namespace ug {
@@ -680,15 +680,17 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		if(c.c == NULL) // group
 		{
 			indexhtml << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->get_default_class()->name() << "</a>\n";
+			indexhtml << "<p> <font size=\"1\">\n";
 			indexhtml << "<ul>";
 			for(size_t j=0; j<c.group->num_classes(); j++)
 			{
-				indexhtml << "<li>" << "<a class=\"el\" href=\"" << c.group->get_class(j)->name() << ".html\">" << c.group->get_class(j)->name() << "</a> (" << GetBeautifiedTag(c.group->get_class_tag(j)) << ")";
+				indexhtml << "<li>" << "<a href=\"" << c.group->get_class(j)->name() << ".html\">" << c.group->get_class(j)->name() << "</a> (" << GetBeautifiedTag(c.group->get_class_tag(j)) << ")";
 				if(c.group->get_default_class() == c.group->get_class(j))
 					indexhtml << " (default)";
 				indexhtml << "\n";
 			}
 			indexhtml << "</ul>";
+			indexhtml << "</font></p>\n";
 		}
 		else
 		{
@@ -786,6 +788,14 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	const char *dir = argv[dirParamIndex+1];
+	char buf[255];
+	int dirlen=strlen(dir);
+	if(dir[dirlen-1]!='/')
+	{
+		strcpy(buf, dir);
+		strcat(buf, "/");
+		dir = buf;
+	}
 	LOG("Writing html files to \"" << dir << "\"" << endl);
 
 	// get registry
