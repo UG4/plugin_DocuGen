@@ -557,6 +557,20 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 
 	classhtml << "<hr>\n";
 
+	classhtml << "<a href=\"http://cave1.gcsc.uni-frankfurt.de/job/ug-doc/doxygen/"
+			"classug_1_1";
+	string groupname;
+	if(d->group == NULL)
+		groupname = name;
+	else groupname = d->group->name();
+	for(int i=0; i<groupname.size(); i++)
+	{
+		if(groupname[i] >= 'A' && groupname[i] <= 'Z') classhtml << '_' <<
+				(char)(groupname[i]-('A'-'a'));
+		else classhtml << groupname[i];
+	}
+	classhtml << ".html\">Doxygen Documentation</a>\n";
+
 	// print parent classes
 	const vector<const char *> *pNames = c.class_names();
 	if(pNames && pNames->size() > 1)
