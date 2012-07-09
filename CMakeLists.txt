@@ -16,5 +16,5 @@ set(srcUGDocu	    src/main.cpp)
 
 add_executable(ugdocu ${srcUGDocu})
 
-
+target_link_libraries(ugcodu compiledstrings)
 target_link_libraries (ugdocu ug4)
