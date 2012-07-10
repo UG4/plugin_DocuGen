@@ -20,6 +20,7 @@
 #include "registry/class_helper.h"
 #include "bridge/bridge.h"
 #include "common/util/parameter_parsing.h"
+#include "compiledstrings.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -75,6 +76,14 @@ string tohtmlstring(const string &str)
 
 void WriteHeader(fstream &file, const string &title)
 {
+	file << "<address style=\"align: right;\"><small>";
+
+	time_t now = time(0);
+	tm *local = localtime(&now);
+	file << "ug4 bridge docu. SVN Revision " << SVN_REVISION << ". Generated on " << asctime(local);
+	file << "</small></address>" << endl;
+
+	file << "<hr size=\"1\">";
 	file << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">" << endl;
 	file << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=iso-8859-1\">";
 	file << "<title>" << tohtmlstring(title) << "</title>" << endl;
@@ -91,12 +100,6 @@ void WriteHeader(fstream &file, const string &title)
 
 void WriteFooter(fstream &file)
 {
-	file << "<hr size=\"1\"><address style=\"align: right;\"><small>";
-
-	time_t now = time(0);
-	tm *local = localtime(&now);
-	file << "Generated on " << asctime(local);
-	file << "</small></address>" << endl;
 
 	file << "</body>" << endl << "</html>" << endl;
 }
