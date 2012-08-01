@@ -20,7 +20,7 @@
 #include "registry/class_helper.h"
 #include "bridge/bridge.h"
 #include "common/util/parameter_parsing.h"
-#include "compiledstrings.h"
+#include "compile_info/compile_info.h"
 #include <stdio.h>
 #include <time.h>
 
