@@ -80,7 +80,7 @@ void WriteHeader(fstream &file, const string &title)
 
 	time_t now = time(0);
 	tm *local = localtime(&now);
-	file << "ug4 bridge docu. SVN Revision " << SVN_REVISION << ". Generated on " << asctime(local);
+	file << "ug4 bridge docu. SVN Revision " << UGSvnRevision() << ". Generated on " << asctime(local);
 	file << "</small></address>" << endl;
 
 	file << "<hr size=\"1\">";
@@ -498,7 +498,7 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		ClassGroupDesc *g = reg.get_class_group(i);
 
 		UG_LOG("group " << g->name() << "\n");
-		for(int j=0; j<g->num_classes(); j++)
+		for(uint j=0; j<g->num_classes(); j++)
 		{
 			UG_LOG("searching " << g->get_class(j)->name() << "\n");
 			UGDocuClassDescription *d = GetUGDocuClassDescription(classes, g->get_class(j));
@@ -566,7 +566,7 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 	if(d->group == NULL)
 		groupname = name;
 	else groupname = d->group->name();
-	for(int i=0; i<groupname.size(); i++)
+	for(uint i=0; i<groupname.size(); i++)
 	{
 		if(groupname[i] >= 'A' && groupname[i] <= 'Z') classhtml << '_' <<
 				(char)(groupname[i]-('A'-'a'));
@@ -666,7 +666,7 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &classesAndGroups, bool bGroup)
 {
 	UG_LOG("WriteClassIndex... ");
-	Registry &reg = GetUGRegistry();
+//	Registry &reg = GetUGRegistry();
 
 	fstream indexhtml((string(dir).append(bGroup ? "groupindex.html" : "index.html")).c_str(), ios::out);
 
