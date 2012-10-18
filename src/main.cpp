@@ -696,8 +696,8 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
 		if(c.c == NULL) // group
 		{
-			indexhtml << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->get_default_class()->name() << "</a>\n";
-			indexhtml << "<p> <font size=\"1\">\n";
+			indexhtml << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->name() << "</a>\n";
+			/*indexhtml << "<p> <font size=\"1\">\n";
 			indexhtml << "<ul>";
 			for(size_t j=0; j<c.group->num_classes(); j++)
 			{
@@ -707,7 +707,7 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 				indexhtml << "\n";
 			}
 			indexhtml << "</ul>";
-			indexhtml << "</font></p>\n";
+			indexhtml << "</font></p>\n";*/
 		}
 		else
 		{
