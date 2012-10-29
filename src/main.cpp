@@ -104,64 +104,84 @@ void WriteFooter(fstream &file)
 	file << "</body>" << endl << "</html>" << endl;
 }
 
-bool ParameterToHTMLString(fstream &file, const bridge::ParameterStack &par, int i)
+bool ParameterToString(ostream &file, const bridge::ParameterStack &par, int i, bool bHTML)
 {
 	switch(par.get_type(i))
 	{
 	default:
 	case PT_UNKNOWN:
-		file << "unknown";
+		file << "unknown ";
 		return true;
 	case PT_BOOL:
-		file << "bool";
+		file << "bool ";
 		return true;
 
 	case PT_INTEGER:
-		file << "integer";
+		file << "integer ";
 		return true;
 
 	case PT_NUMBER:
-		file << "number";
+		file << "number ";
 		return true;
 
 	case PT_CSTRING:
-		file << "c_string";
+		file << "c_string ";
 		return true;
 
 	case PT_STD_STRING:
-		file << "std_string";
+		file << "std_string ";
 		return true;
 
 	case PT_POINTER:
-		file << "<a href=\"" << par.class_name(i) << ".html\"" << ">" << par.class_name(i) << "</a> *";
+		if(bHTML)
+			file << "<a href=\"" << par.class_name(i) << ".html\"" << ">";
+		file << par.class_name(i);
+		if(bHTML)
+			file << "</a> *";
 		return true;
 
 	case PT_CONST_POINTER:
-		file << "const <a href=\"" << par.class_name(i) << ".html\"" << ">" << par.class_name(i) << "</a> *";
+		file << "const ";
+		if(bHTML)
+			file << "<a href=\"" << par.class_name(i) << ".html\"" << ">";
+		file << par.class_name(i);
+		if(bHTML)
+			file << "</a> *";
+		return true;
+		
+	case PT_SMART_POINTER:
+		if(bHTML)	file << "SmartPtr&lt;<a href=\"" << par.class_name(i) << ".html\"" << ">" << par.class_name(i) << "</a>&gt; ";
+		else		file << "SmartPtr<" << par.class_name(i) << "> ";
+		return true;		
+
+	case PT_CONST_SMART_POINTER:
+		if(bHTML)	file << "const SmartPtr&lt;<a href=\"" << par.class_name(i) << ".html\"" << ">" << par.class_name(i) << "</a>&gt; ";
+		else		file << "const SmartPtr<" << par.class_name(i) << "> ";
 		return true;
 	}
 	return false;
 }
 
-bool WriteParametersIn(fstream &file, const bridge::ExportedFunctionBase &thefunc)
+template<typename T>
+bool WriteParametersIn(ostream &file, const T &thefunc, bool bHTML=true)
 {
 	file << "(";
 	for(size_t i=0; i < (size_t)thefunc.params_in().size(); ++i)
 	{
 		if(i>0) file << ", ";
-		ParameterToHTMLString(file, thefunc.params_in(), i);
+		ParameterToString(file, thefunc.params_in(), i, bHTML);
 		if(i<thefunc.num_parameter())
-			file << " " << thefunc.parameter_name(i);
+			file << thefunc.parameter_name(i);
 	}
 	file << ")";
 	return true;
 }
-
-bool WriteParametersOut(fstream &file, const bridge::ExportedFunctionBase &thefunc)
+template<typename T>
+bool WriteParametersOut(ostream &file, const T &thefunc, bool bHTML=true)
 {
 	if(thefunc.params_out().size() == 1)
 	{
-		ParameterToHTMLString(file, thefunc.params_out(), 0);
+		ParameterToString(file, thefunc.params_out(), 0, bHTML);
 		//file << " " << thefunc.return_name();
 	}
 	else if(thefunc.params_out().size() > 1)
@@ -170,18 +190,43 @@ bool WriteParametersOut(fstream &file, const bridge::ExportedFunctionBase &thefu
 		for(int i=0; i < thefunc.params_out().size(); ++i)
 		{
 			if(i>0) file << ", ";
-			ParameterToHTMLString(file, thefunc.params_out(), i);
+			ParameterToString(file, thefunc.params_out(), i, bHTML);
 		}
 		file << ")";
 	}
 	else
 	{
-		file << "void";
+		file << "void ";
 	}
 	return true;
 }
 
-void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefunc,
+void WriteConstructorInfoHTML(ostream &file, string classname, const bridge::ExportedConstructor &thefunc,
+		string group)
+{
+	// function name
+	file << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
+	file << "</td><td class=\"memItemRight\" valign=bottom>";
+	file << classname << " ";
+	WriteParametersIn(file, thefunc);	
+	file << "</td></tr>";
+	
+	if(thefunc.tooltip().size() > 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>";
+	}
+
+	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
+	{
+		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
+		file << "help: " << thefunc.help() << "<br/></td></tr>";
+	}
+}
+
+
+
+void WriteFunctionInfoHTML(ostream &file, const bridge::ExportedFunctionBase &thefunc,
 		const IExportedClass *c = NULL, bool bConst = false)
 {
 	file << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
@@ -196,29 +241,30 @@ void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefun
 	file << thefunc.name() << " ";
 
 	WriteParametersIn(file, thefunc);
-	file << "</td></tr>" << endl;
+	file << "</td></tr>";
 
 	if(thefunc.return_name().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-				file << "returns " << thefunc.return_name() << "<br/></td></tr>" << endl;
+				file << "returns " << thefunc.return_name() << "<br/></td></tr>";
 	}
 
 	if(thefunc.tooltip().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>" << endl;
+		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>";
 	}
 
 	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "help: " << thefunc.help() << "<br/></td></tr>" << endl;
+		file << "help: " << thefunc.help() << "<br/></td></tr>";
 	}
 }
 
 
-void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefunc,
+
+void WriteFunctionInfoHTML(ostream &file, const bridge::ExportedFunctionBase &thefunc,
 		const char *group)
 {
 	file << "<tr>";
@@ -230,42 +276,63 @@ void WriteFunctionInfo(fstream &file, const bridge::ExportedFunctionBase &thefun
 	file << thefunc.name() << " ";
 
 	WriteParametersIn(file, thefunc);
-	file << "</td></tr>" << endl;
+	file << "</td></tr>";
 
 	if(thefunc.return_name().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-				file << "returns " << thefunc.return_name() << "<br/></td></tr>" << endl;
+				file << "returns " << thefunc.return_name() << "<br/></td></tr>";
 	}
 
 	if(thefunc.tooltip().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>" << endl;
+		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>";
 	}
 
 	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
 	{
 		file << "<tr><<td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "help: " << thefunc.help() << "<br/></td></tr>" << endl;
+		file << "help: " << thefunc.help() << "<br/></td></tr>";
 	}
 }
 
+void WriteFunctionHTMLCompleter(ostream &file, const bridge::ExportedFunctionBase &thefunc,
+		const char *group, const char *pClass)
+{
+	WriteParametersOut(file, thefunc);
+	file << thefunc.name() << " ";
+	WriteParametersIn(file, thefunc);
+	file << "<br>" ;
+	if(pClass != NULL) 
+		file << "<br>Member function of class <b>" << pClass << "</b>";
+	if(thefunc.return_name().size() > 0)
+		file << "<br>returns " << thefunc.return_name();
+	
+	if(thefunc.tooltip().size() > 0)
+		file << "<br>tooltip: " << thefunc.tooltip();
+	
+	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
+		file << "<br>help: " << thefunc.help();
+	
+	if(group != NULL)
+		file << "<br>group: <b>" << group << "</b>";
+}
 
 
-void WriteClassHierarchy(fstream &file, ClassHierarchy &c)
+void WriteClassHierarchy(ostream &file, ClassHierarchy &c)
 {
 	file << "<li>";
 	if(!c.bGroup)
-		file << "<a class=\"el\" href=\"" << c.name << ".html\">" << c.name << "</a>" << endl;
+		file << "<a class=\"el\" href=\"" << c.name << ".html\">" << c.name << "</a>";
 	else
-		file << c.name << endl;
+		file << c.name << " ";
 	if(c.subclasses.size())
 	{
-		file << "<ul>" << endl;
+		file << "<ul>";
 		for(size_t i=0; i<c.subclasses.size(); i++)
 			WriteClassHierarchy(file, c.subclasses[i]);
-		file << "</ul>" << endl;
+		file << "</ul>" ;
 	}
 }
 
@@ -274,7 +341,7 @@ void WriteClassHierarchy(fstream &file, ClassHierarchy &c)
  *
  * \param classname the class (and only this class) to print usage in functions/member functions of.
  */
-bool WriteClassUsageExact(const string &preamble, fstream &file, const char *classname, bool OutParameters)
+bool WriteClassUsageExact(const string &preamble, ostream &file, const char *classname, bool OutParameters)
 {
 	Registry &reg = GetUGRegistry();
 	bool bPreambleWritten = false;
@@ -286,7 +353,7 @@ bool WriteClassUsageExact(const string &preamble, fstream &file, const char *cla
 				(OutParameters && IsClassInParameters(thefunc.params_out(), classname)))
 		{
 			if(bPreambleWritten==false) { file << preamble; bPreambleWritten=true; }
-			WriteFunctionInfo(file, thefunc);
+			WriteFunctionInfoHTML(file, thefunc);
 		}
 	}
 
@@ -304,7 +371,7 @@ bool WriteClassUsageExact(const string &preamble, fstream &file, const char *cla
 						(OutParameters && IsClassInParameters(thefunc->params_out(), classname)))
 				{
 					if(bPreambleWritten==false) { file << preamble; bPreambleWritten=true; }
-					WriteFunctionInfo(file, *thefunc, &c, false);
+					WriteFunctionInfoHTML(file, *thefunc, &c, false);
 				}
 			}
 
@@ -320,7 +387,7 @@ bool WriteClassUsageExact(const string &preamble, fstream &file, const char *cla
 						(OutParameters && IsClassInParameters(thefunc->params_out(), classname)))
 				{
 					if(bPreambleWritten==false) { file << preamble; bPreambleWritten=true; }
-					WriteFunctionInfo(file, *thefunc, &c, true);
+					WriteFunctionInfoHTML(file, *thefunc, &c, true);
 				}
 			}
 		}
@@ -328,9 +395,18 @@ bool WriteClassUsageExact(const string &preamble, fstream &file, const char *cla
 	return true;
 }
 
-void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInherited)
+void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInherited)
 {
 	if(c == NULL) return;
+	
+	if(c->num_constructors())
+	{
+		file << "<tr><td colspan=2><h3>";
+		file << c->name() << " Constructors</h3></td></tr>";
+		for(size_t i=0; i<c->num_constructors(); ++i)
+			WriteConstructorInfoHTML(file, c->name(), c->get_constructor(i), c->group());
+		file << "<tr><td><br></td></tr>";
+	}
 	if(c->num_methods() > 0)
 	{
 		std::vector<const bridge::ExportedFunctionBase *> sortedFunctions;
@@ -342,11 +418,12 @@ void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInher
 		}
 		sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
 
-		file << "<tr><td colspan=2><br><h3>";
+		file << "<tr><td colspan=2><h3>";
 		if(bInherited) file << "Inherited ";
-		file << c->name() << " Member Functions</h3></td></tr>" << endl;
+		file << c->name() << " Member Functions</h3></td></tr>";
 		for(size_t i=0; i < sortedFunctions.size(); ++i)
-			WriteFunctionInfo(file, *sortedFunctions[i]);
+			WriteFunctionInfoHTML(file, *sortedFunctions[i]);
+		file << "<tr><td><br></td></tr>";
 	}
 
 	if(c->num_const_methods() > 0)
@@ -360,12 +437,13 @@ void PrintClassFunctionsHMTL(fstream &file, const IExportedClass *c, bool bInher
 		}
 		sort(sortedFunctions.begin(), sortedFunctions.end(), ExportedFunctionsSort);
 
-		file << "<tr><td colspan=2><br><h3>";
+		file << "<tr><td colspan=2><h3>";
 		if(bInherited) file << " Inherited ";
-		file << c->name() << " Const Member Functions</h3></td></tr>" << endl;
+		file << c->name() << " Const Member Functions</h3></td></tr>";
 
 		for(size_t i=0; i < sortedFunctions.size(); ++i)
-			WriteFunctionInfo(file, *sortedFunctions[i]);
+			WriteFunctionInfoHTML(file, *sortedFunctions[i]);
+		file << "<tr><td><br></td></tr>";
 	}
 }
 
@@ -385,10 +463,10 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 {
 	fstream hierarchyhtml((string(dir).append("hierarchy.html")).c_str(), ios::out);
 	WriteHeader(hierarchyhtml, "Class Hierarchy");
-	hierarchyhtml << "<h1>ugbridge Class Hierarchy (ug4)</h1>This inheritance list sorted hierarchically:<ul>" << endl;
+	hierarchyhtml << "<h1>ugbridge Class Hierarchy (ug4)</h1>This inheritance list sorted hierarchically:<ul>";
 	for(size_t i=0; i<hierarchy.subclasses.size(); i++)
 		WriteClassHierarchy(hierarchyhtml, hierarchy.subclasses[i]);
-	hierarchyhtml << "</ul>"<<endl;
+	hierarchyhtml << "</ul>";
 	WriteFooter(hierarchyhtml);
 }
 
@@ -482,7 +560,8 @@ UGDocuClassDescription *GetUGDocuClassDescription(std::vector<UGDocuClassDescrip
 		//if(classes[i].c == c) return &classes[i];
 }
 
-void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups)
+void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups,
+		std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations )
 {
 	Registry &reg = GetUGRegistry();
 
@@ -490,20 +569,20 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		classes.push_back(UGDocuClassDescription(&reg.get_class(i)));
 	sort(classes.begin(), classes.end(), NameSortFunction);
 
-	for(size_t i=0; i<reg.num_classes(); ++i)
-		UG_LOG(classes[i].name() << "\n");
+	//for(size_t i=0; i<reg.num_classes(); ++i)
+	//	UG_LOG(classes[i].name() << "\n");
 
 	for(size_t i=0; i<reg.num_class_groups(); ++i)
 	{
 		ClassGroupDesc *g = reg.get_class_group(i);
 
-		UG_LOG("group " << g->name() << "\n");
+		//UG_LOG("group " << g->name() << "\n");
 		for(uint j=0; j<g->num_classes(); j++)
 		{
-			UG_LOG("searching " << g->get_class(j)->name() << "\n");
+			//UG_LOG("searching " << g->get_class(j)->name() << "\n");
 			UGDocuClassDescription *d = GetUGDocuClassDescription(classes, g->get_class(j));
 			if(d) { d->group = g; d->tag = g->get_class_tag(j);  }
-			else UG_LOG("not found.\n");
+			//else UG_LOG("not found.\n");
 		}
 	}
 
@@ -512,23 +591,110 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		if(classes[i].group == NULL)
 			classesAndGroups.push_back(classes[i]);
 	}
+	classesAndGroupsAndImplementations = classes;
 
 	for(size_t i=0; i<reg.num_class_groups(); ++i)
-		classesAndGroups.push_back(UGDocuClassDescription(reg.get_class_group(i)));
+	{
+		UGDocuClassDescription d(reg.get_class_group(i));
+		classesAndGroups.push_back(d);
+		classesAndGroupsAndImplementations.push_back(d);
+	}
 
 	sort(classesAndGroups.begin(), classesAndGroups.end(), NameSortFunction);
 
+	/*
 	for(size_t i=0; i<classesAndGroups.size(); i++)
 	{
 		UG_LOG(classesAndGroups[i].group_str() << "	" << classesAndGroups[i].name());
 		if(classesAndGroups[i].c == NULL) UG_LOG("	(group)");
 		UG_LOG("\n");
-	}
+	}*/
 }
 
+void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
+{
+	Registry &reg = GetUGRegistry();
+	const IExportedClass *pC = d->c;
+	if(pC == NULL)
+	{
+		pC = d->group->get_default_class();
+		if(pC == NULL)
+		{
+			classhtml << "Group <b>" << d->group->name() << "</b> has no default implementation.";
+			return;
+		}
+		classhtml << "Class <b>" << pC->name() << "</b>, default implementation of group <b>" 
+				<< d->group->name() << "</b><br>";
+	}
+	else if(d->group != NULL)
+		classhtml << "Group <b>" << d->group->name() << "</b><br>";
+	
+	if(pC->is_instantiable())
+		classhtml << "class has constructor. ";
+	else
+		classhtml << "class has no constructor. ";
+	if(d->tag.size() > 0) classhtml << " Tag <b>" << d->tag << "</b>";
+	classhtml << "<br>";
+	if(pC->tooltip().size() != 0)
+		classhtml << pC->tooltip() << "<br>";
+
+	// print parent classes
+	const vector<const char *> *pNames = pC->class_names();
+	if(pNames && pNames->size() > 1)
+	{
+		classhtml << "Inheritance: ";
+		for(vector<const char*>::const_reverse_iterator rit = pNames->rbegin(); rit < pNames->rend(); ++rit)
+			classhtml << "<a href=\"" << (*rit) << ".html\">" << (*rit) << "</a> ";
+		classhtml << "<br>";
+	}
+
+	
+	// print member functions
+	classhtml 	<< "<table>";
+	PrintClassFunctionsHMTL(classhtml, pC, false);
+	if(pNames)
+	{
+		// print inherited member functions
+		for(size_t i=1; i<pNames->size(); i++)
+			PrintClassFunctionsHMTL(classhtml, FindClass(reg, pNames->at(i)), true);
+	}
+
+	
+	classhtml << "</table>";
+	return;
+
+	// print usage of this class in other classes
+
+	classhtml 	<< "Usage Information<br>";
+	classhtml 	<< "<table>";
+	
+	string name = pC->name();
+
+	// functions returning this class
+	string str = string("<tr><td colspan=2><br><h3> Functions returning ") + string(name) + string("</h2></td></tr>");
+	WriteClassUsageExact(str, classhtml, name.c_str(), true);
+
+	// functions using this class or its parents
+	if(pNames)
+	{
+		for(size_t i=0; i<pNames->size(); i++)
+		{
+			string str = string("<tr><td colspan=2><br><h3> Functions using ") + string(pNames->at(i))
+					+ string("</h2></td></tr>\n");
+			WriteClassUsageExact(str, classhtml, pNames->at(i), false);
+		}
+	}
+	else
+	{
+		string str = string("<tr><td colspan=2><br><h3> Functions using ") + string(name)
+							+ string("</h2></td></tr>\n");
+		WriteClassUsageExact(str, classhtml, name.c_str(), false);
+	}
+	classhtml << "</table>";
+}
 
 // write html file for a class
-void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
+void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
 {
 	Registry &reg = GetUGRegistry();
 
@@ -539,7 +705,7 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 	WriteHeader(classhtml, name);
 
 	if(d->group == NULL)
-		classhtml 	<< "<h1>" << name << " Class Reference</h1>" << endl;
+		classhtml 	<< "<h1>" << name << " Class Reference</h1>";
 	else
 	{
 		classhtml << "<h1>" << d->group->name() << " Class Reference</h1>";
@@ -556,7 +722,7 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 		classhtml << "class has no constructor<br>";
 
 
-	classhtml << "<br>Group <b>" << c.group() << "</b><br>" << endl;
+	classhtml << "<br>Group <b>" << c.group() << "</b><br>";
 
 	classhtml << "<hr>\n";
 
@@ -580,17 +746,17 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 	{
 		for(vector<const char*>::const_reverse_iterator rit = pNames->rbegin(); rit < pNames->rend(); ++rit)
 		{
-			classhtml << "<ul>" << endl;
-			classhtml << "<li><a class=\"el\" href=\"" << (*rit) << ".html\">" << (*rit) << "</a>" << endl;
+			classhtml << "<ul>";
+			classhtml << "<li><a class=\"el\" href=\"" << (*rit) << ".html\">" << (*rit) << "</a>";
 		}
 		for(size_t i=0; i<pNames->size(); i++)
-			classhtml << "</ul>" << endl;
+			classhtml << "</ul>";
 	}
 
 	// print member functions
 
-	classhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
-				<< "<tr><td></td></tr>" << endl;
+	classhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>"
+				<< "<tr><td></td></tr>";
 
 	PrintClassFunctionsHMTL(classhtml, &c, false);
 	if(pNames)
@@ -600,14 +766,14 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 			PrintClassFunctionsHMTL(classhtml, FindClass(reg, pNames->at(i)), true);
 	}
 
-	classhtml << "</table>" << endl;
+	classhtml << "</table>";
 
 	// print usage of this class in other classes
 
-	classhtml 	<< "<hr> <h1>Usage Information</h1>" << endl;
+	classhtml 	<< "<hr> <h1>Usage Information</h1>";
 
-	classhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
-						<< "<tr><td></td></tr>" << endl;
+	classhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>"
+						<< "<tr><td></td></tr>";
 
 	// functions returning this class
 	string str = string("<tr><td colspan=2><br><h3> Functions returning ") + string(name) + string("</h2></td></tr>\n");
@@ -629,20 +795,20 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 							+ string("</h2></td></tr>\n");
 		WriteClassUsageExact(str, classhtml, name.c_str(), false);
 	}
-	classhtml << "</table>" << endl;
+	classhtml << "</table>";
 
 	// print subclasses of this class
 	ClassHierarchy *theclass = hierarchy.find_class(name.c_str());
 	if(theclass && theclass->subclasses.size() > 0)
 	{
-		classhtml 	<< "<h1>Subclasses</h1><ul>" << endl;
+		classhtml 	<< "<h1>Subclasses</h1><ul>";
 		WriteClassHierarchy(classhtml, *theclass);
 		classhtml << "</ul>";
 	}
 
 	if(d->group != NULL)
 	{
-		classhtml 	<< "<hr> <h1>Other Implementations of " << d->group->name() << "</h1>" << endl;
+		classhtml 	<< "<hr> <h1>Other Implementations of " << d->group->name() << "</h1>";
 		classhtml << "<ul>";
 		for(size_t j=0; j<d->group->num_classes(); j++)
 		{
@@ -665,7 +831,7 @@ void WriteClass(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hier
 // write alphabetical class index in index.html
 void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &classesAndGroups, bool bGroup)
 {
-	UG_LOG("WriteClassIndex... ");
+	UG_LOG("WriteClassIndex" << (bGroup?" by group " : "") << "... ");
 //	Registry &reg = GetUGRegistry();
 
 	fstream indexhtml((string(dir).append(bGroup ? "groupindex.html" : "index.html")).c_str(), ios::out);
@@ -673,18 +839,18 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 	if(bGroup)
 	{
 		WriteHeader(indexhtml, "Class Index by Group");
-		indexhtml << "<h1>ug4 Class Index by Group</h1>" << endl;
+		indexhtml << "<h1>ug4 Class Index by Group</h1>";
 		sort(classesAndGroups.begin(), classesAndGroups.end(), GroupNameSortFunction);
 	}
 	else
 	{
 		WriteHeader(indexhtml, "Class Index");
-		indexhtml << "<h1>ug4 Class Index</h1>" << endl;
+		indexhtml << "<h1>ug4 Class Index</h1>";
 		sort(classesAndGroups.begin(), classesAndGroups.end(), NameSortFunction);
 	}
 
-	indexhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
-					<< "<tr><td></td></tr>" << endl;
+	indexhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>"
+					<< "<tr><td></td></tr>";
 	for(size_t i=0; i<classesAndGroups.size(); i++)
 	{
 		indexhtml << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
@@ -692,7 +858,7 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		UGDocuClassDescription &c = classesAndGroups[i];
 		indexhtml << c.group_str();
 		indexhtml << " ";
-		indexhtml << "</td>" << endl;
+		indexhtml << "</td>";
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
 		if(c.c == NULL) // group
 		{
@@ -714,10 +880,10 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 			indexhtml << "<a class=\"el\" href=\"" << c.name() << ".html\">" << c.name() << "</a>";
 		}
 
-		indexhtml << "</td></tr>" << endl;
+		indexhtml << "</td></tr>";
 	}
 
-	indexhtml 	<< "</table>" << endl;
+	indexhtml 	<< "</table>";
 	WriteFooter(indexhtml);
 	UG_LOG(classesAndGroups.size() << " class groups written. " << endl);
 }
@@ -738,7 +904,7 @@ void WriteGroupClassIndex(const char *dir)
 	fstream indexhtml((string(dir).append("groupindex.html")).c_str(), ios::out);
 
 	WriteHeader(indexhtml, "Class Index by Group");
-	indexhtml << "<h1>ug4 Class Index by Group</h1>" << endl;
+	indexhtml << "<h1>ug4 Class Index by Group</h1>";
 
 	for(size_t i=0; i<class_names.size(); i++)
 	{
@@ -747,9 +913,9 @@ void WriteGroupClassIndex(const char *dir)
 		indexhtml << "<li>" << str.substr(0, pos) << " <a class=\"el\" href=\"" << str.substr(pos+1) << ".html\">" << str.substr(pos+1) << "</a>";
 	}
 
-	indexhtml 	<< "</table>" << endl;
+	indexhtml 	<< "</table>";
 	WriteFooter(indexhtml);
-	UG_LOG(class_names.size() << " class names written. " << endl);
+	UG_LOG(class_names.size() << " class names written. " );
 }
 
 
@@ -758,7 +924,7 @@ template<typename TSortFunction>
 void WriteGlobalFunctions(const char *dir, const char *filename,
 		TSortFunction sortFunction)
 {
-	UG_LOG("WriteGlobalFunctions (" << filename << ") ...");
+	UG_LOG("WriteGlobalFunctions (" << filename << ") ... ");
 	Registry &reg = GetUGRegistry();
 
 	std::vector<const bridge::ExportedFunction *> sortedFunctions;
@@ -772,18 +938,71 @@ void WriteGlobalFunctions(const char *dir, const char *filename,
 
 	fstream funchtml((string(dir).append(filename)).c_str(), ios::out);
 	WriteHeader(funchtml, "Global Functions Index by Group");
-	funchtml 	<< "<table border=0 cellpadding=0 cellspacing=0>" << endl
-				<< "<tr><td></td></tr>" << endl;
+	funchtml 	<< "<table border=0 cellpadding=0 cellspacing=0>"
+				<< "<tr><td></td></tr>";
 	for(size_t i=0; i<sortedFunctions.size(); i++)
-		WriteFunctionInfo(funchtml, *sortedFunctions[i], sortedFunctions[i]->group().c_str());
-	funchtml 	<< "</table>" << endl;
+		WriteFunctionInfoHTML(funchtml, *sortedFunctions[i], sortedFunctions[i]->group().c_str());
+	funchtml 	<< "</table>";
 	WriteFooter(funchtml);
 	UG_LOG(reg.num_functions() << " functions written." << endl);
 }
 
+
+void WriteConstructorCompleter(ostream &f, string classname, const bridge::ExportedConstructor &thefunc,
+		string group)
+{
+	// function name
+	f << "constructor\n" << classname << "\n";
+	// returntype
+	f << "\n";
+	//if(pClass != NULL) f << pClass << ":";
+	// signature
+	f << classname << " ";
+	WriteParametersIn(f, thefunc, false);	
+	f << "\n";
+	// html
+	f << classname << " ";
+	WriteParametersIn(f, thefunc);
+	f << "<br>Constructor of class <b>" << classname << "</b>";
+	if(thefunc.tooltip().size() > 0)
+		f << "<br>tooltip: " << thefunc.tooltip();
+	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
+		f << "<br>help: " << thefunc.help();
+	if(group.length() != 0)
+		f << "<br>group: <b>" << group << "</b>";	
+	f << "\n";
+}
+
+void WriteFunctionCompleter(ostream &f, const char *desc, const bridge::ExportedFunctionBase &thefunc,
+		string group, const char *pClass=NULL, bool bConst=false)
+{
+	// function name
+	f << desc << "\n" << thefunc.name() << "\n";
+	// returntype
+	if(thefunc.params_out().size()==0)
+		f << "void\n";
+	else
+		f << ParameterToString(thefunc.params_out(), 0) << "\n";
+	// signature
+	WriteParametersOut(f, thefunc, false);
+	//if(pClass != NULL) f << pClass << ":";
+	f << thefunc.name() << " ";
+	WriteParametersIn(f, thefunc, false);
+	if(bConst) f << " const";
+	f << "\n";
+	// html
+	WriteFunctionHTMLCompleter(f, thefunc, group.c_str(), pClass);	
+	f << "\n";
+}
+
+
+
 int main(int argc, char* argv[])
 {
-	UGInit(&argc, &argv, 0);
+	UGInit(&argc, &argv);
+	if(FindParam("-silent", argc, argv))
+		GetLogAssistant().enable_terminal_output(false);
+	
 
 	LOG("****************************************************************\n");
 	LOG("* ugdocu - v0.1.0\n");
@@ -793,63 +1012,162 @@ int main(int argc, char* argv[])
 
 	std::vector<UGDocuClassDescription> classes;
 	std::vector<UGDocuClassDescription> classesAndGroups;
+	std::vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 
-	GetGroups(classes, classesAndGroups);
+	GetGroups(classes, classesAndGroups, classesAndGroupsAndImplementations);
 
-	int dirParamIndex = GetParamIndex("-d", argc, argv);
-
-	if(dirParamIndex == -1)
-	{
-		LOG("error: no directory. Please specify directory.\n");
-		UGFinalize();
-		return 0;
-	}
-	const char *dir = argv[dirParamIndex+1];
-	char buf[255];
-	int dirlen=strlen(dir);
-	if(dir[dirlen-1]!='/')
-	{
-		strcpy(buf, dir);
-		strcat(buf, "/");
-		dir = buf;
-	}
-	LOG("Writing html files to \"" << dir << "\"" << endl);
-
-	// get registry
+	
+	
 	Registry &reg = GetUGRegistry();
-
 	// init registry with cpualgebra and dim == 2
 	AlgebraType algebra("CPU", 1);
 	const int dim = 2;
 	InitUG(dim, algebra);
 
-	WriteUGDocuCSS(dir);
-
-	// print class hierarchy in hierarchy.html
 	ClassHierarchy hierarchy;
 	UG_LOG("GetClassHierarchy... ");
 	GetClassHierarchy(hierarchy, reg);
-
 	UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
-	UG_LOG("WriteClassHierarchy... ");
-	WriteClassHierarchy(dir, hierarchy);
+	
+	
+	const char* baseDir = NULL;	
+	if(ParamToString(&baseDir, "-d", argc, argv))
+	{
+		// Write HTML docu
+		string s_dir = baseDir;		
+		if(baseDir[strlen(baseDir)-1]!='/')
+			s_dir.append("/");
+		const char *dir = s_dir.c_str();
+		LOG("Writing html files to \"" << dir << "\"" << endl);
+
+		// get registry
 
 
-	// write html file for each class
-	UG_LOG(endl << "WriteClasses... ");
-	for(size_t i=0; i<reg.num_classes(); ++i)
-		WriteClass(dir, GetUGDocuClassDescription(classes, &reg.get_class(i)), hierarchy);
-	UG_LOG(reg.num_classes() << " classes written." << endl);
 
-	WriteClassIndex(dir, classesAndGroups, false);
-	WriteClassIndex(dir, classesAndGroups, true);
-	//WriteGroupClassIndex(dir, classesAndGroups);
+		WriteUGDocuCSS(dir);
 
-	WriteGlobalFunctions(dir, "functions.html", ExportedFunctionsSort);
-	WriteGlobalFunctions(dir, "groupedfunctions.html", ExportedFunctionsGroupSort);
+		// print class hierarchy in hierarchy.html
 
-	UG_LOG("done." << endl);
 
+		UG_LOG("WriteClassHierarchy... ");
+		WriteClassHierarchy(dir, hierarchy);
+
+
+		// write html file for each class
+		UG_LOG(endl << "WriteClasses... ");
+		for(size_t i=0; i<reg.num_classes(); ++i)
+			WriteClassHTML(dir, GetUGDocuClassDescription(classes, &reg.get_class(i)), hierarchy);
+		UG_LOG(reg.num_classes() << " classes written." << endl);
+
+		WriteClassIndex(dir, classesAndGroups, false);
+		WriteClassIndex(dir, classesAndGroups, true);
+		//WriteGroupClassIndex(dir, classesAndGroups);
+
+		WriteGlobalFunctions(dir, "functions.html", ExportedFunctionsSort);
+		WriteGlobalFunctions(dir, "groupedfunctions.html", ExportedFunctionsGroupSort);
+
+		UG_LOG("done." << endl);
+	}
+
+	// Write ug4CompletionList.txt 
+	/*
+	function
+	name
+	returntype
+	signature
+	html
+	.
+	class
+	name
+	 class hierachy
+	html
+	memberfunction name
+	returntype
+	signature
+	html
+
+	memberfunction
+	name
+	returntype
+	signature
+	html
+*/	
+	{
+		std::string ug4CompletionFile = PathProvider::get_path(ROOT_PATH) + "/apps/ugdocu/myUg4CompletionList.txt";
+		Registry &reg = GetUGRegistry();
+		fstream f(ug4CompletionFile.c_str(), ios::out);
+        UG_LOG("Writing completion info to " << ug4CompletionFile << " ...\n");
+		f << "UG4COMPLETER VERSION 1\n";
+		for(size_t i=0; i<classesAndGroupsAndImplementations.size(); i++)
+		{
+			//cout << classesAndGroupsAndImplementations[i].name() << "\n";
+			// class\nclassname
+			f << "class\n" << classesAndGroupsAndImplementations[i].name() << "\n";			
+			
+			// class hierachy
+			const IExportedClass *c = classesAndGroupsAndImplementations[i].c;
+			if(c == NULL)
+				c = classesAndGroupsAndImplementations[i].group->get_default_class();			
+			
+			// inheritance
+			if(c != NULL)
+			{
+				const vector<const char *> *pNames = c->class_names();
+				if(pNames)
+					for(vector<const char*>::const_reverse_iterator rit = pNames->rbegin(); rit < pNames->rend(); ++rit)
+						if(strcmp((*rit), c->name().c_str()) != 0)
+							f << (*rit) << " ";
+				
+			}
+			f << "\n";
+			
+			// html			
+			WriteClassCompleter(f, &classesAndGroupsAndImplementations[i], hierarchy);
+			f << "\n";
+			
+			// memberfunctions
+			
+			if(c != NULL)
+			{
+				for(size_t i=0; i<c->num_constructors(); ++i)
+					WriteConstructorCompleter(f, c->name(), c->get_constructor(i), c->group());
+				
+				for(size_t i=0; i<c->num_methods(); ++i)
+				{
+					const ExportedMethodGroup &grp = c->get_method_group(i);
+					for(size_t j=0; j<grp.num_overloads(); j++)
+						WriteFunctionCompleter(f, "memberfunction", *grp.get_overload(j), c->group(), c->name().c_str());
+				}
+				for(size_t i=0; i<c->num_const_methods(); ++i)
+				{
+					const ExportedMethodGroup &grp = c->get_const_method_group(i);
+					for(size_t j=0; j<grp.num_overloads(); j++)
+						WriteFunctionCompleter(f, "memberfunction", *grp.get_overload(j), c->group(), c->name().c_str(), true);
+				}
+			}
+			f << ";\n";
+		}
+		UG_LOG("Wrote " << classesAndGroupsAndImplementations.size() << " classes/groups.\n");
+		
+		for(size_t i=0; i<reg.num_functions(); i++)
+		{
+			ExportedFunctionGroup &fg = reg.get_function_group(i);
+			for(size_t j=0; j<fg.num_overloads(); j++)
+				WriteFunctionCompleter(f, "function", *fg.get_overload(j), fg.get_overload(j)->group(), false);
+		}
+		UG_LOG("Wrote " << reg.num_functions() << " global functions.\n");
+		UG_LOG("done.");
+		
+		if(FindParam("-silent", argc, argv))
+		{
+			GetLogAssistant().enable_terminal_output(true);			
+			cout << "Wrote ug4 completion file to " << ug4CompletionFile << ", " << classesAndGroupsAndImplementations.size() << " classes/groups, " << reg.num_functions() << " global functions.\n";
+			GetLogAssistant().enable_terminal_output(false);
+		}
+			
+	}
+
+	
 	UGFinalize();
 	return 0;
 }
