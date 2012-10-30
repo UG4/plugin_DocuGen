@@ -13020,6 +13020,21 @@ ISelector
 class has no constructor. <br><table></table>
 ;
 class
+IStressMaterialResponse1d
+
+Group <b>IStressMaterialResponse</b><br>class has no constructor.  Tag <b>dim=1d;</b><br><table></table>
+;
+class
+IStressMaterialResponse2d
+
+Group <b>IStressMaterialResponse</b><br>class has no constructor.  Tag <b>dim=2d;</b><br><table></table>
+;
+class
+IStressMaterialResponse3d
+
+Group <b>IStressMaterialResponse</b><br>class has no constructor.  Tag <b>dim=3d;</b><br><table></table>
+;
+class
 ISubsetHandler
 
 class has no constructor. <br><table><tr><td colspan=2><h3>ISubsetHandler Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_subset_name (c_string , integer )</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>ISubsetHandler Const Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>integer </td><td class="memItemRight" valign=bottom>get_subset_index (c_string )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>c_string </td><td class="memItemRight" valign=bottom>get_subset_name (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>integer </td><td class="memItemRight" valign=bottom>num_subsets ()</td></tr><tr><td><br></td></tr></table>
@@ -13723,6 +13738,16 @@ set_approximation_space
 void
 void set_approximation_space (SmartPtr<ApproximationSpace3d> )
 void set_approximation_space (SmartPtr&lt;<a href="ApproximationSpace3d.html">ApproximationSpace3d</a>&gt; )<br><br>Member function of class <b>LagrangeDifferenceBoundary3dCPU3</b><br>group: <b>ug4/Neuron//Discretization/3d</b>
+;
+class
+LinProjElementEvaluator2d
+
+Group <b>LinProjElementEvaluator</b><br>class has no constructor.  Tag <b>dim=2d;</b><br><table></table>
+;
+class
+LinProjElementEvaluator3d
+
+Group <b>LinProjElementEvaluator</b><br>class has no constructor.  Tag <b>dim=3d;</b><br><table></table>
 ;
 class
 LinearElastoPlasticity1d
@@ -15320,6 +15345,166 @@ NoUpwind3d ()
 NoUpwind3d ()<br>Constructor of class <b>NoUpwind3d</b><br>group: <b>/ug4/SpatialDisc/Upwind</b>
 ;
 class
+NonlinearElastoPlasticity2d
+LinProjElementEvaluator2d IElemDisc IDomainElemDisc2d 
+Group <b>NonlinearElastoPlasticity</b><br>class has constructor.  Tag <b>dim=2d;</b><br>Inheritance: <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> <a href="IElemDisc.html">IElemDisc</a> <a href="IDomainElemDisc2d.html">IDomainElemDisc2d</a> <a href="NonlinearElastoPlasticity2d.html">NonlinearElastoPlasticity2d</a> <br><table><tr><td colspan=2><h3>NonlinearElastoPlasticity2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>NonlinearElastoPlasticity2d (c_string Function, c_string Subsets)</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>NonlinearElastoPlasticity2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>close_gnuplot_file ()</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>init_state_variables (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>open_gnuplot_file ()</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_elasticity_tensor_formulation (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_mat_response (SmartPtr&lt;<a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a>&gt; )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_quad_order (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_tangent_accuracy (number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (SmartPtr&lt;<a href="UserVector2d.html">UserVector2d</a>&gt; Force field)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F_x, F_y, number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F_x, F_y, F_z, number , number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (c_string Force field)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>stress_eigenvalues_at (number , number , number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_gnuplot_output (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+NonlinearElastoPlasticity2d
+
+NonlinearElastoPlasticity2d (c_string Function, c_string Subsets)
+NonlinearElastoPlasticity2d (c_string Function, c_string Subsets)<br>Constructor of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_quad_order
+void
+void set_quad_order (integer )
+void set_quad_order (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (SmartPtr<UserVector2d> Force field)
+void set_volume_forces (SmartPtr&lt;<a href="UserVector2d.html">UserVector2d</a>&gt; Force field)<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F)
+void set_volume_forces (number F)<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F_x, F_y, number )
+void set_volume_forces (number F_x, F_y, number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F_x, F_y, F_z, number , number )
+void set_volume_forces (number F_x, F_y, F_z, number , number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (c_string Force field)
+void set_volume_forces (c_string Force field)<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_mat_response
+void
+void set_mat_response (SmartPtr<IStressMaterialResponse2d> )
+void set_mat_response (SmartPtr&lt;<a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a>&gt; )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_elasticity_tensor_formulation
+void
+void set_elasticity_tensor_formulation (integer )
+void set_elasticity_tensor_formulation (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_tangent_accuracy
+void
+void set_tangent_accuracy (number )
+void set_tangent_accuracy (number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+init_state_variables
+void
+void init_state_variables (integer )
+void init_state_variables (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+stress_eigenvalues_at
+void
+void stress_eigenvalues_at (number , number , number )
+void stress_eigenvalues_at (number , number , number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_gnuplot_output
+void
+void write_gnuplot_output (number )
+void write_gnuplot_output (number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+open_gnuplot_file
+void
+void open_gnuplot_file ()
+void open_gnuplot_file ()<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+close_gnuplot_file
+void
+void close_gnuplot_file ()
+void close_gnuplot_file ()<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+NonlinearElastoPlasticity3d
+LinProjElementEvaluator3d IElemDisc IDomainElemDisc3d 
+Group <b>NonlinearElastoPlasticity</b><br>class has constructor.  Tag <b>dim=3d;</b><br>Inheritance: <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> <a href="IElemDisc.html">IElemDisc</a> <a href="IDomainElemDisc3d.html">IDomainElemDisc3d</a> <a href="NonlinearElastoPlasticity3d.html">NonlinearElastoPlasticity3d</a> <br><table><tr><td colspan=2><h3>NonlinearElastoPlasticity3d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>NonlinearElastoPlasticity3d (c_string Function, c_string Subsets)</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>NonlinearElastoPlasticity3d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>close_gnuplot_file ()</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>init_state_variables (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>open_gnuplot_file ()</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_elasticity_tensor_formulation (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_mat_response (SmartPtr&lt;<a href="IStressMaterialResponse3d.html">IStressMaterialResponse3d</a>&gt; )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_quad_order (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_tangent_accuracy (number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (SmartPtr&lt;<a href="UserVector3d.html">UserVector3d</a>&gt; Force field)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F_x, F_y, number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F_x, F_y, F_z, number , number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (c_string Force field)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>stress_eigenvalues_at (number , number , number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_gnuplot_output (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+NonlinearElastoPlasticity3d
+
+NonlinearElastoPlasticity3d (c_string Function, c_string Subsets)
+NonlinearElastoPlasticity3d (c_string Function, c_string Subsets)<br>Constructor of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_quad_order
+void
+void set_quad_order (integer )
+void set_quad_order (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (SmartPtr<UserVector3d> Force field)
+void set_volume_forces (SmartPtr&lt;<a href="UserVector3d.html">UserVector3d</a>&gt; Force field)<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F)
+void set_volume_forces (number F)<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F_x, F_y, number )
+void set_volume_forces (number F_x, F_y, number )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F_x, F_y, F_z, number , number )
+void set_volume_forces (number F_x, F_y, F_z, number , number )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (c_string Force field)
+void set_volume_forces (c_string Force field)<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_mat_response
+void
+void set_mat_response (SmartPtr<IStressMaterialResponse3d> )
+void set_mat_response (SmartPtr&lt;<a href="IStressMaterialResponse3d.html">IStressMaterialResponse3d</a>&gt; )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_elasticity_tensor_formulation
+void
+void set_elasticity_tensor_formulation (integer )
+void set_elasticity_tensor_formulation (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_tangent_accuracy
+void
+void set_tangent_accuracy (number )
+void set_tangent_accuracy (number )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+init_state_variables
+void
+void init_state_variables (integer )
+void init_state_variables (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+stress_eigenvalues_at
+void
+void stress_eigenvalues_at (number , number , number )
+void stress_eigenvalues_at (number , number , number )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_gnuplot_output
+void
+void write_gnuplot_output (number )
+void write_gnuplot_output (number )<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+open_gnuplot_file
+void
+void open_gnuplot_file ()
+void open_gnuplot_file ()<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+close_gnuplot_file
+void
+void close_gnuplot_file ()
+void close_gnuplot_file ()<br><br>Member function of class <b>NonlinearElastoPlasticity3d</b><br>group: <b>ug4//Discretization</b>
+;
+class
 OneSideP1Constraints1dCPU1
 IConstraintCPU1 IDomainConstraint1dCPU1 
 Group <b>OneSideP1Constraints</b><br>class has constructor.  Tag <b>dim=1d;alg=CPU1;</b><br>Inheritance: <a href="IConstraintCPU1.html">IConstraintCPU1</a> <a href="IDomainConstraint1dCPU1.html">IDomainConstraint1dCPU1</a> <a href="OneSideP1Constraints1dCPU1.html">OneSideP1Constraints1dCPU1</a> <br><table><tr><td colspan=2><h3>OneSideP1Constraints1dCPU1 Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>OneSideP1Constraints1dCPU1 ()</td></tr><tr><td><br></td></tr></table>
@@ -16285,6 +16470,126 @@ integer num_hexahedrons () const
 integer num_hexahedrons ()<br><br>Member function of class <b>Selector</b><br>group: <b>/ug4/Grid</b>
 ;
 class
+SimoMaterialResponse1d
+IStressMaterialResponse1d 
+Group <b>SimoMaterialResponse</b><br>class has constructor.  Tag <b>dim=1d;</b><br>Inheritance: <a href="IStressMaterialResponse1d.html">IStressMaterialResponse1d</a> <a href="SimoMaterialResponse1d.html">SimoMaterialResponse1d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponse1d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse1d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse1d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponse1d
+
+SimoMaterialResponse1d ()
+SimoMaterialResponse1d ()<br>Constructor of class <b>SimoMaterialResponse1d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponse1d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponse1d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+SimoMaterialResponse2d
+IStressMaterialResponse2d 
+Group <b>SimoMaterialResponse</b><br>class has constructor.  Tag <b>dim=2d;</b><br>Inheritance: <a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a> <a href="SimoMaterialResponse2d.html">SimoMaterialResponse2d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponse2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse2d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponse2d
+
+SimoMaterialResponse2d ()
+SimoMaterialResponse2d ()<br>Constructor of class <b>SimoMaterialResponse2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponse2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponse2d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+SimoMaterialResponse3d
+IStressMaterialResponse3d 
+Group <b>SimoMaterialResponse</b><br>class has constructor.  Tag <b>dim=3d;</b><br>Inheritance: <a href="IStressMaterialResponse3d.html">IStressMaterialResponse3d</a> <a href="SimoMaterialResponse3d.html">SimoMaterialResponse3d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponse3d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse3d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse3d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponse3d
+
+SimoMaterialResponse3d ()
+SimoMaterialResponse3d ()<br>Constructor of class <b>SimoMaterialResponse3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponse3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponse3d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+SimoMaterialResponseLin1d
+IStressMaterialResponse1d SimoMaterialResponse1d 
+Group <b>SimoMaterialResponseLin</b><br>class has constructor.  Tag <b>dim=1d;</b><br>Inheritance: <a href="IStressMaterialResponse1d.html">IStressMaterialResponse1d</a> <a href="SimoMaterialResponse1d.html">SimoMaterialResponse1d</a> <a href="SimoMaterialResponseLin1d.html">SimoMaterialResponseLin1d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponseLin1d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponseLin1d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponseLin1d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse1d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse1d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>Inherited SimoMaterialResponse1d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponseLin1d
+
+SimoMaterialResponseLin1d ()
+SimoMaterialResponseLin1d ()<br>Constructor of class <b>SimoMaterialResponseLin1d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponseLin1d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponseLin1d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+SimoMaterialResponseLin2d
+IStressMaterialResponse2d SimoMaterialResponse2d 
+Group <b>SimoMaterialResponseLin</b><br>class has constructor.  Tag <b>dim=2d;</b><br>Inheritance: <a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a> <a href="SimoMaterialResponse2d.html">SimoMaterialResponse2d</a> <a href="SimoMaterialResponseLin2d.html">SimoMaterialResponseLin2d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponseLin2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponseLin2d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponseLin2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse2d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>Inherited SimoMaterialResponse2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponseLin2d
+
+SimoMaterialResponseLin2d ()
+SimoMaterialResponseLin2d ()<br>Constructor of class <b>SimoMaterialResponseLin2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponseLin2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponseLin2d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+SimoMaterialResponseLin3d
+IStressMaterialResponse3d SimoMaterialResponse3d 
+Group <b>SimoMaterialResponseLin</b><br>class has constructor.  Tag <b>dim=3d;</b><br>Inheritance: <a href="IStressMaterialResponse3d.html">IStressMaterialResponse3d</a> <a href="SimoMaterialResponse3d.html">SimoMaterialResponse3d</a> <a href="SimoMaterialResponseLin3d.html">SimoMaterialResponseLin3d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponseLin3d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponseLin3d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponseLin3d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse3d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse3d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>Inherited SimoMaterialResponse3d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponseLin3d
+
+SimoMaterialResponseLin3d ()
+SimoMaterialResponseLin3d ()<br>Constructor of class <b>SimoMaterialResponseLin3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponseLin3d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponseLin3d</b><br>group: <b>ug4//Discretization</b>
+;
+class
 SolutionTimeSeriesCPU1
 
 Group <b>SolutionTimeSeries</b><br>class has constructor.  Tag <b>alg=CPU1;</b><br><table><tr><td colspan=2><h3>SolutionTimeSeriesCPU1 Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SolutionTimeSeriesCPU1 ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SolutionTimeSeriesCPU1 Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>SmartPtr&lt;<a href="VectorCPU1.html">VectorCPU1</a>&gt; </td><td class="memItemRight" valign=bottom>latest ()</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns latest solution<br/></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>SmartPtr&lt;<a href="VectorCPU1.html">VectorCPU1</a>&gt; </td><td class="memItemRight" valign=bottom>oldest ()</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns oldest solution<br/></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>push (SmartPtr&lt;<a href="VectorCPU1.html">VectorCPU1</a>&gt; vec, number time)</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">tooltip: adds new time point, not discarding the oldest<br/></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>SmartPtr&lt;<a href="VectorCPU1.html">VectorCPU1</a>&gt; </td><td class="memItemRight" valign=bottom>push_discard_oldest (SmartPtr&lt;<a href="VectorCPU1.html">VectorCPU1</a>&gt; vec, number time)</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns oldest solution<br/></td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">tooltip: adds new time point, oldest solution is discarded and returned<br/></td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SolutionTimeSeriesCPU1 Const Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>integer </td><td class="memItemRight" valign=bottom>size ()</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns number of time steps handled<br/></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>const SmartPtr&lt;<a href="VectorCPU1.html">VectorCPU1</a>&gt; </td><td class="memItemRight" valign=bottom>solution (integer i)</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the local vector for the i'th time point<br/></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>number </td><td class="memItemRight" valign=bottom>time (integer i)</td></tr><tr><td class="mdescLeft">&#160;</td><td class="mdescRight">returns point in time for solution<br/></td></tr><tr><td><br></td></tr></table>
@@ -17063,6 +17368,21 @@ GetSurface
 number
 number GetSurface (integer ) const
 number GetSurface (integer )<br><br>Member function of class <b>TKDGeometryGenerator</b><br>returns Surface of given subset (1 element)<br>group: <b>ug4/tkd_generator/</b>
+;
+class
+TensorMatUtilFuncs1d
+
+Group <b>TensorMatUtilFuncs</b><br>class has no constructor.  Tag <b>dim=1d;</b><br><table></table>
+;
+class
+TensorMatUtilFuncs2d
+
+Group <b>TensorMatUtilFuncs</b><br>class has no constructor.  Tag <b>dim=2d;</b><br><table></table>
+;
+class
+TensorMatUtilFuncs3d
+
+Group <b>TensorMatUtilFuncs</b><br>class has no constructor.  Tag <b>dim=3d;</b><br><table></table>
 ;
 class
 ThermohalineFlow1d
@@ -23694,6 +24014,141 @@ void
 void set_name (c_string )
 void set_name (c_string )<br><br>Member function of class <b>DirichletTimeDependent2d</b><br>group: <b>ug4/Neuron/</b>
 ;
+class
+TensorMatUtilFuncs
+
+Class <b>TensorMatUtilFuncs2d</b>, default implementation of group <b>TensorMatUtilFuncs</b><br>class has no constructor. <br><table></table>
+;
+class
+IStressMaterialResponse
+
+Class <b>IStressMaterialResponse2d</b>, default implementation of group <b>IStressMaterialResponse</b><br>class has no constructor. <br><table></table>
+;
+class
+SimoMaterialResponse
+IStressMaterialResponse2d 
+Class <b>SimoMaterialResponse2d</b>, default implementation of group <b>SimoMaterialResponse</b><br>class has constructor. <br>Inheritance: <a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a> <a href="SimoMaterialResponse2d.html">SimoMaterialResponse2d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponse2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse2d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponse2d
+
+SimoMaterialResponse2d ()
+SimoMaterialResponse2d ()<br>Constructor of class <b>SimoMaterialResponse2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponse2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponse2d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+SimoMaterialResponseLin
+IStressMaterialResponse2d SimoMaterialResponse2d 
+Class <b>SimoMaterialResponseLin2d</b>, default implementation of group <b>SimoMaterialResponseLin</b><br>class has constructor. <br>Inheritance: <a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a> <a href="SimoMaterialResponse2d.html">SimoMaterialResponse2d</a> <a href="SimoMaterialResponseLin2d.html">SimoMaterialResponseLin2d</a> <br><table><tr><td colspan=2><h3>SimoMaterialResponseLin2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponseLin2d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponseLin2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>SimoMaterialResponse2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>SimoMaterialResponse2d ()</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>Inherited SimoMaterialResponse2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_hardening_behavior (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_data_to_console (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+SimoMaterialResponseLin2d
+
+SimoMaterialResponseLin2d ()
+SimoMaterialResponseLin2d ()<br>Constructor of class <b>SimoMaterialResponseLin2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_hardening_behavior
+void
+void set_hardening_behavior (integer )
+void set_hardening_behavior (integer )<br><br>Member function of class <b>SimoMaterialResponseLin2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_data_to_console
+void
+void write_data_to_console (number )
+void write_data_to_console (number )<br><br>Member function of class <b>SimoMaterialResponseLin2d</b><br>group: <b>ug4//Discretization</b>
+;
+class
+LinProjElementEvaluator
+
+Class <b>LinProjElementEvaluator2d</b>, default implementation of group <b>LinProjElementEvaluator</b><br>class has no constructor. <br><table></table>
+;
+class
+NonlinearElastoPlasticity
+LinProjElementEvaluator2d IElemDisc IDomainElemDisc2d 
+Class <b>NonlinearElastoPlasticity2d</b>, default implementation of group <b>NonlinearElastoPlasticity</b><br>class has constructor. <br>Inheritance: <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> <a href="IElemDisc.html">IElemDisc</a> <a href="IDomainElemDisc2d.html">IDomainElemDisc2d</a> <a href="NonlinearElastoPlasticity2d.html">NonlinearElastoPlasticity2d</a> <br><table><tr><td colspan=2><h3>NonlinearElastoPlasticity2d Constructors</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top></td><td class="memItemRight" valign=bottom>NonlinearElastoPlasticity2d (c_string Function, c_string Subsets)</td></tr><tr><td><br></td></tr><tr><td colspan=2><h3>NonlinearElastoPlasticity2d Member Functions</h3></td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>close_gnuplot_file ()</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>init_state_variables (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>open_gnuplot_file ()</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_elasticity_tensor_formulation (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_mat_response (SmartPtr&lt;<a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a>&gt; )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_quad_order (integer )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_tangent_accuracy (number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (SmartPtr&lt;<a href="UserVector2d.html">UserVector2d</a>&gt; Force field)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F_x, F_y, number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (number F_x, F_y, F_z, number , number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>set_volume_forces (c_string Force field)</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>stress_eigenvalues_at (number , number , number )</td></tr><tr><td class="memItemLeft" nowrap align=right valign=top>void </td><td class="memItemRight" valign=bottom>write_gnuplot_output (number )</td></tr><tr><td><br></td></tr></table>
+constructor
+NonlinearElastoPlasticity2d
+
+NonlinearElastoPlasticity2d (c_string Function, c_string Subsets)
+NonlinearElastoPlasticity2d (c_string Function, c_string Subsets)<br>Constructor of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_quad_order
+void
+void set_quad_order (integer )
+void set_quad_order (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (SmartPtr<UserVector2d> Force field)
+void set_volume_forces (SmartPtr&lt;<a href="UserVector2d.html">UserVector2d</a>&gt; Force field)<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F)
+void set_volume_forces (number F)<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F_x, F_y, number )
+void set_volume_forces (number F_x, F_y, number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (number F_x, F_y, F_z, number , number )
+void set_volume_forces (number F_x, F_y, F_z, number , number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_volume_forces
+void
+void set_volume_forces (c_string Force field)
+void set_volume_forces (c_string Force field)<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_mat_response
+void
+void set_mat_response (SmartPtr<IStressMaterialResponse2d> )
+void set_mat_response (SmartPtr&lt;<a href="IStressMaterialResponse2d.html">IStressMaterialResponse2d</a>&gt; )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_elasticity_tensor_formulation
+void
+void set_elasticity_tensor_formulation (integer )
+void set_elasticity_tensor_formulation (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+set_tangent_accuracy
+void
+void set_tangent_accuracy (number )
+void set_tangent_accuracy (number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+init_state_variables
+void
+void init_state_variables (integer )
+void init_state_variables (integer )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+stress_eigenvalues_at
+void
+void stress_eigenvalues_at (number , number , number )
+void stress_eigenvalues_at (number , number , number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+write_gnuplot_output
+void
+void write_gnuplot_output (number )
+void write_gnuplot_output (number )<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+open_gnuplot_file
+void
+void open_gnuplot_file ()
+void open_gnuplot_file ()<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+memberfunction
+close_gnuplot_file
+void
+void close_gnuplot_file ()
+void close_gnuplot_file ()<br><br>Member function of class <b>NonlinearElastoPlasticity2d</b><br>group: <b>ug4//Discretization</b>
+;
 function
 MakeVec
 SmartPtr<Vec1d>
@@ -24158,47 +24613,62 @@ function
 FaceArea
 number
 number FaceArea (Domain1d, ISubsetHandler, integer , integer )
-number FaceArea (<a href="Domain1d.html">Domain1d</a> *, <a href="ISubsetHandler.html">ISubsetHandler</a> *, integer , integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain1d.html">Domain1d</a> *, <a href="ISubsetHandler.html">ISubsetHandler</a> *, integer , integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Subset handler#Subset index#Grid level</b>
 function
 FaceArea
 number
 number FaceArea (Domain1d, integer , integer )
-number FaceArea (<a href="Domain1d.html">Domain1d</a> *, integer , integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain1d.html">Domain1d</a> *, integer , integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domaim#Subset index#Grid level</b>
 function
 FaceArea
 number
 number FaceArea (Domain1d, integer )
-number FaceArea (<a href="Domain1d.html">Domain1d</a> *, integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain1d.html">Domain1d</a> *, integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Subset index</b>
+function
+FaceArea
+number
+number FaceArea (Domain1d, ISelector)
+number FaceArea (<a href="Domain1d.html">Domain1d</a> *, <a href="ISelector.html">ISelector</a> *)<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Selector</b>
 function
 FaceArea
 number
 number FaceArea (Domain2d, ISubsetHandler, integer , integer )
-number FaceArea (<a href="Domain2d.html">Domain2d</a> *, <a href="ISubsetHandler.html">ISubsetHandler</a> *, integer , integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain2d.html">Domain2d</a> *, <a href="ISubsetHandler.html">ISubsetHandler</a> *, integer , integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Subset handler#Subset index#Grid level</b>
 function
 FaceArea
 number
 number FaceArea (Domain2d, integer , integer )
-number FaceArea (<a href="Domain2d.html">Domain2d</a> *, integer , integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain2d.html">Domain2d</a> *, integer , integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domaim#Subset index#Grid level</b>
 function
 FaceArea
 number
 number FaceArea (Domain2d, integer )
-number FaceArea (<a href="Domain2d.html">Domain2d</a> *, integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain2d.html">Domain2d</a> *, integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Subset index</b>
+function
+FaceArea
+number
+number FaceArea (Domain2d, ISelector)
+number FaceArea (<a href="Domain2d.html">Domain2d</a> *, <a href="ISelector.html">ISelector</a> *)<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Selector</b>
 function
 FaceArea
 number
 number FaceArea (Domain3d, ISubsetHandler, integer , integer )
-number FaceArea (<a href="Domain3d.html">Domain3d</a> *, <a href="ISubsetHandler.html">ISubsetHandler</a> *, integer , integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain3d.html">Domain3d</a> *, <a href="ISubsetHandler.html">ISubsetHandler</a> *, integer , integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Subset handler#Subset index#Grid level</b>
 function
 FaceArea
 number
 number FaceArea (Domain3d, integer , integer )
-number FaceArea (<a href="Domain3d.html">Domain3d</a> *, integer , integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain3d.html">Domain3d</a> *, integer , integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domaim#Subset index#Grid level</b>
 function
 FaceArea
 number
 number FaceArea (Domain3d, integer )
-number FaceArea (<a href="Domain3d.html">Domain3d</a> *, integer )<br><br>group: <b>/ug4/Domain</b>
+number FaceArea (<a href="Domain3d.html">Domain3d</a> *, integer )<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Subset index</b>
+function
+FaceArea
+number
+number FaceArea (Domain3d, ISelector)
+number FaceArea (<a href="Domain3d.html">Domain3d</a> *, <a href="ISelector.html">ISelector</a> *)<br><br>returns /ug4/Domain<br>group: <b>Area sum#Domain#Selector</b>
 function
 TestDomainInterfaces
 bool
@@ -27734,6 +28204,186 @@ HhFlux
 void
 void HhFlux (VectorCPU1, const VectorCPU1, const VectorCPU1, const VectorCPU1, const VectorCPU1, const VectorCPU1)
 void HhFlux (<a href="VectorCPU1.html">VectorCPU1</a> *, const <a href="VectorCPU1.html">VectorCPU1</a> *, const <a href="VectorCPU1.html">VectorCPU1</a> *, const <a href="VectorCPU1.html">VectorCPU1</a> *, const <a href="VectorCPU1.html">VectorCPU1</a> *, const <a href="VectorCPU1.html">VectorCPU1</a> *)<br><br>group: <b>ug4/Neuron/</b>
+function
+LinProj_init
+bool
+bool LinProj_init (LinProjElementEvaluator2d, const GridFunction2dCPU1)
+bool LinProj_init (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_init
+bool
+bool LinProj_init (LinProjElementEvaluator2d, const GridFunction2dCPU2)
+bool LinProj_init (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_init
+bool
+bool LinProj_init (LinProjElementEvaluator2d, const GridFunction2dCPU3)
+bool LinProj_init (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_init
+bool
+bool LinProj_init (LinProjElementEvaluator3d, const GridFunction3dCPU1)
+bool LinProj_init (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_init
+bool
+bool LinProj_init (LinProjElementEvaluator3d, const GridFunction3dCPU2)
+bool LinProj_init (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_init
+bool
+bool LinProj_init (LinProjElementEvaluator3d, const GridFunction3dCPU3)
+bool LinProj_init (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_error_begin
+number
+number LinProj_error_begin (LinProjElementEvaluator2d, const GridFunction2dCPU1)
+number LinProj_error_begin (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_error_begin
+number
+number LinProj_error_begin (LinProjElementEvaluator2d, const GridFunction2dCPU2)
+number LinProj_error_begin (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_error_begin
+number
+number LinProj_error_begin (LinProjElementEvaluator2d, const GridFunction2dCPU3)
+number LinProj_error_begin (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_error_begin
+number
+number LinProj_error_begin (LinProjElementEvaluator3d, const GridFunction3dCPU1)
+number LinProj_error_begin (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_error_begin
+number
+number LinProj_error_begin (LinProjElementEvaluator3d, const GridFunction3dCPU2)
+number LinProj_error_begin (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_error_begin
+number
+number LinProj_error_begin (LinProjElementEvaluator3d, const GridFunction3dCPU3)
+number LinProj_error_begin (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_check_tolerance
+number
+number LinProj_check_tolerance (LinProjElementEvaluator2d, const GridFunction2dCPU1)
+number LinProj_check_tolerance (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_check_tolerance
+number
+number LinProj_check_tolerance (LinProjElementEvaluator2d, const GridFunction2dCPU2)
+number LinProj_check_tolerance (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_check_tolerance
+number
+number LinProj_check_tolerance (LinProjElementEvaluator2d, const GridFunction2dCPU3)
+number LinProj_check_tolerance (<a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_check_tolerance
+number
+number LinProj_check_tolerance (LinProjElementEvaluator3d, const GridFunction3dCPU1)
+number LinProj_check_tolerance (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_check_tolerance
+number
+number LinProj_check_tolerance (LinProjElementEvaluator3d, const GridFunction3dCPU2)
+number LinProj_check_tolerance (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+LinProj_check_tolerance
+number
+number LinProj_check_tolerance (LinProjElementEvaluator3d, const GridFunction3dCPU3)
+number LinProj_check_tolerance (<a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+linProj_error
+void
+void linProj_error (number , GridFunction2dCPU1, LinProjElementEvaluator2d, const GridFunction2dCPU1)
+void linProj_error (number , <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+linProj_error
+void
+void linProj_error (number , GridFunction2dCPU2, LinProjElementEvaluator2d, const GridFunction2dCPU2)
+void linProj_error (number , <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+linProj_error
+void
+void linProj_error (number , GridFunction2dCPU3, LinProjElementEvaluator2d, const GridFunction2dCPU3)
+void linProj_error (number , <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+linProj_error
+void
+void linProj_error (number , GridFunction3dCPU1, LinProjElementEvaluator3d, const GridFunction3dCPU1)
+void linProj_error (number , <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+linProj_error
+void
+void linProj_error (number , GridFunction3dCPU2, LinProjElementEvaluator3d, const GridFunction3dCPU2)
+void linProj_error (number , <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+linProj_error
+void
+void linProj_error (number , GridFunction3dCPU3, LinProjElementEvaluator3d, const GridFunction3dCPU3)
+void linProj_error (number , <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+equiv_plastic_strain
+void
+void equiv_plastic_strain (number , GridFunction2dCPU1, LinProjElementEvaluator2d, const GridFunction2dCPU1)
+void equiv_plastic_strain (number , <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+equiv_plastic_strain
+void
+void equiv_plastic_strain (number , GridFunction2dCPU2, LinProjElementEvaluator2d, const GridFunction2dCPU2)
+void equiv_plastic_strain (number , <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+equiv_plastic_strain
+void
+void equiv_plastic_strain (number , GridFunction2dCPU3, LinProjElementEvaluator2d, const GridFunction2dCPU3)
+void equiv_plastic_strain (number , <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+equiv_plastic_strain
+void
+void equiv_plastic_strain (number , GridFunction3dCPU1, LinProjElementEvaluator3d, const GridFunction3dCPU1)
+void equiv_plastic_strain (number , <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+equiv_plastic_strain
+void
+void equiv_plastic_strain (number , GridFunction3dCPU2, LinProjElementEvaluator3d, const GridFunction3dCPU2)
+void equiv_plastic_strain (number , <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+equiv_plastic_strain
+void
+void equiv_plastic_strain (number , GridFunction3dCPU3, LinProjElementEvaluator3d, const GridFunction3dCPU3)
+void equiv_plastic_strain (number , <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+plastic_ip
+void
+void plastic_ip (GridFunction2dCPU1, LinProjElementEvaluator2d, const GridFunction2dCPU1)
+void plastic_ip (<a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU1.html">GridFunction2dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+plastic_ip
+void
+void plastic_ip (GridFunction2dCPU2, LinProjElementEvaluator2d, const GridFunction2dCPU2)
+void plastic_ip (<a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU2.html">GridFunction2dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+plastic_ip
+void
+void plastic_ip (GridFunction2dCPU3, LinProjElementEvaluator2d, const GridFunction2dCPU3)
+void plastic_ip (<a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *, <a href="LinProjElementEvaluator2d.html">LinProjElementEvaluator2d</a> *, const <a href="GridFunction2dCPU3.html">GridFunction2dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+plastic_ip
+void
+void plastic_ip (GridFunction3dCPU1, LinProjElementEvaluator3d, const GridFunction3dCPU1)
+void plastic_ip (<a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU1.html">GridFunction3dCPU1</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+plastic_ip
+void
+void plastic_ip (GridFunction3dCPU2, LinProjElementEvaluator3d, const GridFunction3dCPU2)
+void plastic_ip (<a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU2.html">GridFunction3dCPU2</a> *)<br><br>group: <b>ug4//Discretization</b>
+function
+plastic_ip
+void
+void plastic_ip (GridFunction3dCPU3, LinProjElementEvaluator3d, const GridFunction3dCPU3)
+void plastic_ip (<a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *, <a href="LinProjElementEvaluator3d.html">LinProjElementEvaluator3d</a> *, const <a href="GridFunction3dCPU3.html">GridFunction3dCPU3</a> *)<br><br>group: <b>ug4//Discretization</b>
 function
 PluginSaysHello
 void
