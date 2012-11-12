@@ -36,7 +36,7 @@ namespace ug {
 
 namespace bridge
 {
-extern bool IsClassInParameters(const bridge::ParameterStack &par, const char *classname);
+extern bool IsClassInParameters(const bridge::ParameterInfo &par, const char *classname);
 extern const IExportedClass *FindClass(const char* classname);
 }
 
