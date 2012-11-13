@@ -104,62 +104,69 @@ void WriteFooter(fstream &file)
 	file << "</body>" << endl << "</html>" << endl;
 }
 
-bool ParameterToString(ostream &file, const bridge::ParameterStack &par, int i, bool bHTML)
-{
-	switch(par.get_type(i))
+bool ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, bool bHTML)
+{	
+	if(par.is_vector(i)){
+		if(bHTML) file << "std::vector&lt";
+		else file << "std::vector<";
+	}
+	switch(par.type(i))
 	{
 	default:
-	case PT_UNKNOWN:
+	case Variant::VT_INVALID:
 		file << "unknown ";
-		return true;
-	case PT_BOOL:
+		break;
+	case Variant::VT_BOOL:
 		file << "bool ";
-		return true;
+		break;
 
-	case PT_INTEGER:
+	case Variant::VT_INT:
 		file << "integer ";
-		return true;
+		break;
 
-	case PT_NUMBER:
+	case Variant::VT_FLOAT:
+	case Variant::VT_DOUBLE:
 		file << "number ";
-		return true;
+		break;
 
-	case PT_CSTRING:
+	case Variant::VT_CSTRING:
 		file << "c_string ";
-		return true;
+		break;
 
-	case PT_STD_STRING:
+	case Variant::VT_STDSTRING:
 		file << "std_string ";
-		return true;
+		break;
 
-	case PT_POINTER:
-		if(bHTML)
-			file << "<a href=\"" << par.class_name(i) << ".html\"" << ">";
+	case Variant::VT_POINTER:
+		if(bHTML)	file << "<a href=\"" << par.class_name(i) << ".html\"" << ">";
 		file << par.class_name(i);
-		if(bHTML)
-			file << "</a> *";
-		return true;
+		if(bHTML)	file << "</a>";
+		file << " *";
+		break;
 
-	case PT_CONST_POINTER:
+	case Variant::VT_CONST_POINTER:
 		file << "const ";
-		if(bHTML)
-			file << "<a href=\"" << par.class_name(i) << ".html\"" << ">";
+		if(bHTML)	file << "<a href=\"" << par.class_name(i) << ".html\"" << ">";
 		file << par.class_name(i);
-		if(bHTML)
-			file << "</a> *";
-		return true;
+		if(bHTML)	file << "</a>";
+		file << " *";
+		break;
 		
-	case PT_SMART_POINTER:
+	case Variant::VT_SMART_POINTER:
 		if(bHTML)	file << "SmartPtr&lt;<a href=\"" << par.class_name(i) << ".html\"" << ">" << par.class_name(i) << "</a>&gt; ";
 		else		file << "SmartPtr<" << par.class_name(i) << "> ";
-		return true;		
+		break;
 
-	case PT_CONST_SMART_POINTER:
+	case Variant::VT_CONST_SMART_POINTER:
 		if(bHTML)	file << "const SmartPtr&lt;<a href=\"" << par.class_name(i) << ".html\"" << ">" << par.class_name(i) << "</a>&gt; ";
 		else		file << "const SmartPtr<" << par.class_name(i) << "> ";
-		return true;
+		break;
 	}
-	return false;
+	if(par.is_vector(i)){
+		if(bHTML) file << "&gt";
+		else file << ">";
+	}
+	return true;
 }
 
 template<typename T>
@@ -1153,14 +1160,14 @@ int main(int argc, char* argv[])
 		{
 			ExportedFunctionGroup &fg = reg.get_function_group(i);
 			for(size_t j=0; j<fg.num_overloads(); j++)
-				WriteFunctionCompleter(f, "function", *fg.get_overload(j), fg.get_overload(j)->group(), false);
+				WriteFunctionCompleter(f, "function", *fg.get_overload(j), fg.get_overload(j)->group(), NULL, false);
 		}
 		UG_LOG("Wrote " << reg.num_functions() << " global functions.\n");
-		UG_LOG("done.");
+		UG_LOG("done!");
 		
 		if(FindParam("-silent", argc, argv))
 		{
-			GetLogAssistant().enable_terminal_output(true);			
+			GetLogAssistant().enable_terminal_output(true);
 			cout << "Wrote ug4 completion file to " << ug4CompletionFile << ", " << classesAndGroupsAndImplementations.size() << " classes/groups, " << reg.num_functions() << " global functions.\n";
 			GetLogAssistant().enable_terminal_output(false);
 		}
