@@ -1027,7 +1027,13 @@ int main(int argc, char* argv[])
 	
 	Registry &reg = GetUGRegistry();
 	// init registry with cpualgebra and dim == 2
+#if defined UG_CPU_1
 	AlgebraType algebra("CPU", 1);
+#elif defined UG_CRS_1
+    AlgebraType algebra("CRS", 1);
+#else
+#error "no suitable algebra found"
+#endif
 	const int dim = 2;
 	InitUG(dim, algebra);
 
