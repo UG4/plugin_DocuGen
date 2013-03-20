@@ -37,7 +37,6 @@ namespace ug {
 namespace bridge
 {
 extern bool IsClassInParameters(const bridge::ParameterInfo &par, const char *classname);
-extern const IExportedClass *FindClass(const char* classname);
 }
 
 
@@ -663,7 +662,7 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 	{
 		// print inherited member functions
 		for(size_t i=1; i<pNames->size(); i++)
-			PrintClassFunctionsHMTL(classhtml, FindClass(reg, pNames->at(i)), true);
+			PrintClassFunctionsHMTL(classhtml, reg.get_class(pNames->at(i)), true);
 	}
 
 	
@@ -770,7 +769,7 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 	{
 		// print inherited member functions
 		for(size_t i=1; i<pNames->size(); i++)
-			PrintClassFunctionsHMTL(classhtml, FindClass(reg, pNames->at(i)), true);
+			PrintClassFunctionsHMTL(classhtml, reg.get_class(pNames->at(i)), true);
 	}
 
 	classhtml << "</table>";
