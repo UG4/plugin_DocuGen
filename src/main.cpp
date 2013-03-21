@@ -1009,6 +1009,7 @@ int main(int argc, char* argv[])
 	if(FindParam("-silent", argc, argv))
 		GetLogAssistant().enable_terminal_output(false);
 	
+	ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
 
 	LOG("****************************************************************\n");
 	LOG("* ugdocu - v0.1.0\n");
