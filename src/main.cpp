@@ -1002,6 +1002,49 @@ void WriteFunctionCompleter(ostream &f, const char *desc, const bridge::Exported
 }
 
 
+/*int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank)
+{
+	PROFILE_FUNC();
+	bool success = true;
+
+	static bool firstCall = true;
+	if (firstCall) {
+		firstCall = false;
+
+#ifdef UG_PARALLEL
+		pcl::Init(argcp, argvp);
+		GetLogAssistant().set_output_process(parallelOutputProcRank);
+#endif
+
+		success &= InitPaths((*argvp)[0]);
+
+#ifdef UG_BRIDGE
+		try{
+			bridge::InitBridge();
+		}
+		catch(UGError& err)
+		{
+			success &= false;
+			UG_LOG("ERROR in UGInit: InitBridge failed!\n");
+		}
+#endif
+
+#ifdef UG_PLUGINS
+	#ifdef UG_EMBEDDED_PLUGINS
+		InitializeEmbeddedPlugins(&bridge::GetUGRegistry(), "(Embedded Plugin) ug4/");
+	#else
+		if(!LoadPlugins(ug::PathProvider::get_path(PLUGIN_PATH).c_str(), "(Plugin) ug4/"))
+		{
+			success &= false;
+			UG_LOG("ERROR in UGInit: LoadPlugins failed!\n");
+		}
+	#endif
+#endif
+	}
+
+	// convert boolean success == true to int = 0.
+	return !success;
+}*/
 
 int main(int argc, char* argv[])
 {
