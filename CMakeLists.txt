@@ -12,7 +12,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 include("../../cmake/ug_includes.cmake")
 
-set(srcUGDocu	    src/main.cpp)
+set(srcUGDocu	    src/ugdocu.cpp
+    src/completion_list_generation.cpp
+    src/ugdocu_misc.cpp
+    src/html_generation.cpp
+    src/ug_docu_class_description.cpp)
 
 add_executable(ugdocu ${srcUGDocu})
 
