@@ -167,3 +167,8 @@ INPUT.search { font-size: 75%;
 }
 TD.tiny      { font-size: 75%;
 }
+<style type="text/css">
+  ul.LinkedList { display: block; }
+  ul.LinkedList ul { display: none; } 
+  .HandCursorStyle { cursor: pointer; cursor: hand; }  /* For IE */
+</style>

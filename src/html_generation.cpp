@@ -25,6 +25,8 @@
 
 // to refresh this file, use xxd -i ugdocu.css > ugdocu.css.h
 #include "ugdocu.css.h"
+// to refresh this file, use xxd -i clickEventHandler.txt > clickEventHandler.txt.h
+#include "clickEventHandler.txt.h"
 
 
 using namespace std;
@@ -32,7 +34,7 @@ using namespace ug;
 using namespace bridge;
 
 namespace ug{
-
+string GetClassGroup(string classname);
 template<typename T>
 void remove_doubles(vector<T> &v)
 {
@@ -65,6 +67,7 @@ void WriteHeader(fstream &file, const string &title)
 	file << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=iso-8859-1\">";
 	file << "<title>" << tohtmlstring(title) << "</title>" << endl;
 	file << "<link href=\"ugdocu.css\" rel=\"stylesheet\" type=\"text/css\">" << endl;
+	file << clickEventHandler_txt << endl;
 	file << "</head><body>" << endl;
 
 	//file << "<div class=\"qindex\"><a class=\"qindex\" href=\"hierarchy.html\">Class Hierarchy</a>";
@@ -122,7 +125,7 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 	if(bConst)
 		file << " const ";
 	if(c)
-		file << "<a href=\"" << c->name() << ".html\"" << ">" << c->name() << "</a>::";
+		file << "<a href=\"" << c->name() << ".html\"" << ">" << GetClassGroup(c->name()) << "</a>::";
 
 	file << thefunc.name() << " ";
 
@@ -259,7 +262,7 @@ void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInher
 	if(c->num_constructors())
 	{
 		file << "<tr><td colspan=2><h3>";
-		file << c->name() << " Constructors</h3></td></tr>";
+		file << GetClassGroup(c->name()) << " Constructors</h3></td></tr>";
 		for(size_t i=0; i<c->num_constructors(); ++i)
 			file << ConstructorInfoHTML(c->name(), c->get_constructor(i), c->group());
 		file << "<tr><td><br></td></tr>";
@@ -277,7 +280,7 @@ void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInher
 
 		file << "<tr><td colspan=2><h3>";
 		if(bInherited) file << "Inherited ";
-		file << c->name() << " Member Functions</h3></td></tr>";
+		file << GetClassGroup(c->name()) << " Member Functions</h3></td></tr>";
 		for(size_t i=0; i < sortedFunctions.size(); ++i)
 			file << FunctionInfoHTML(*sortedFunctions[i]);
 		file << "<tr><td><br></td></tr>";
@@ -296,7 +299,7 @@ void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInher
 
 		file << "<tr><td colspan=2><h3>";
 		if(bInherited) file << " Inherited ";
-		file << c->name() << " Const Member Functions</h3></td></tr>";
+		file << GetClassGroup(c->name()) << " Const Member Functions</h3></td></tr>";
 
 		for(size_t i=0; i < sortedFunctions.size(); ++i)
 			file << FunctionInfoHTML(*sortedFunctions[i]);
@@ -383,7 +386,7 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 		for(vector<const char*>::const_reverse_iterator rit = pNames->rbegin(); rit < pNames->rend(); ++rit)
 		{
 			classhtml << "<ul>";
-			classhtml << "<li><a class=\"el\" href=\"" << (*rit) << ".html\">" << (*rit) << "</a>";
+			classhtml << "<li><a class=\"el\" href=\"" << (*rit) << ".html\">" << GetClassGroup(*rit) << "</a>";
 		}
 		for(size_t i=0; i<pNames->size(); i++)
 			classhtml << "</ul>";
@@ -536,41 +539,39 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 	std::map<string, UGRegistryGroup> groups;
 	GetGroups(groups);
 
+	std::map<string, string> groupsstring;
 
 	for(map<string, UGRegistryGroup>::iterator it = groups.begin(); it != groups.end(); ++it)
 	{
 		string g = it->first;
 		UG_LOG("group '" << g << "'\n");
+		stringstream ss;
+		ss << "\n";
+		ss<< "<h1>Group " << g << "</h1>\n";
 
-		fstream f(GetFilenameForGroup(g, dir).c_str(), ios::out);
-
-		WriteHeader(f, (string("Group ")+g).c_str());
-		f << "\n";
-		f << "<h1>Group " << g << "</h1>\n";
-
-		f << "<h2>Classes</h2>\n";
-		f << "<table border=0 cellpadding=0 cellspacing=0><tr><td></td></tr>";
+		ss << "<h2>Classes</h2>\n";
+		ss << "<table border=0 cellpadding=0 cellspacing=0><tr><td></td></tr>";
 
 		for(size_t i=0; i< it->second.classesAndGroups.size(); i++)
 		{
 			UGDocuClassDescription &c = it->second.classesAndGroups[i];
 			//if(strcmp(c.group_str().c_str(), g.c_str()) != 0) continue;
-			f << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
+			ss << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
 
-			f << c.group_str();
-			f << " ";
-			f << "</td>";
-			f << "<td class=\"memItemRight\" valign=bottom>";
+			ss << c.group_str();
+			ss << " ";
+			ss << "</td>";
+			ss << "<td class=\"memItemRight\" valign=bottom>";
 			if(c.c == NULL) // group
-				f << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->name() << "</a>\n";
+				ss << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->name() << "</a>\n";
 			else
-				f << "<a class=\"el\" href=\"" << c.name() << ".html\">" << c.name() << "</a>";
-			f << "</td></tr>\n";
+				ss << "<a class=\"el\" href=\"" << c.name() << ".html\">" << c.name() << "</a>";
+			ss << "</td></tr>\n";
 		}
 
-		f << "</table>";
-		f << "<h2>Functions</h2>\n";
-		f << "<table border=0 cellpadding=0 cellspacing=0>"
+		ss << "</table>";
+		ss << "<h2>Functions</h2>\n";
+		ss << "<table border=0 cellpadding=0 cellspacing=0>"
 									<< "<tr><td></td></tr>";
 		vector<string> vstr;
 		for(size_t i=0; i< it->second.functions.size(); i++)
@@ -580,33 +581,44 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 		}
 		remove_doubles(vstr);
 		for(vector<string>::iterator it = vstr.begin(); it != vstr.end(); ++it)
-			f << *it;
-		f << "</table>";
+			ss << *it;
+		ss << "</table>";
+
+		fstream f(GetFilenameForGroup(g, dir).c_str(), ios::out);
+		WriteHeader(f, (string("Group ")+g).c_str());
+		f << ss.str();
 		WriteFooter(f);
+		groupsstring[it->first] = ss.str();
 	}
 
 	fstream indexhtml((string(dir).append("groups_index.html")).c_str(), ios::out);
 
 	WriteHeader(indexhtml, "Groups");
 	indexhtml << "<h1>Groups</h1>\n";
-	indexhtml << "<ul>\n";
+	indexhtml << "<ul id=\"LinkedList1\" class=\"LinkedList\">\n";
 	for(map<string, UGRegistryGroup>::iterator it = groups.begin(); it != groups.end(); ++it)
 	{
 		string g = it->first;
 		if(IsPluginGroup(g)==true) continue;
 		string filename = GetFilenameForGroup(g, dir);
 		if(g.compare("") == 0) g = "(empty group)";
-		indexhtml << "<li><a class=\"el\" href=\"" << filename << "\">" << g << "</a>\n";
+		//indexhtml << "<li><a class=\"el\" href=\"" << filename << "\">" << g << "</a>\n";
+		indexhtml << "<li>" << g << "\n";
+		indexhtml << "<ul><li>" << groupsstring[it->first] << "</ul>\n";
 	}
 	indexhtml << "</ul>\n";
 	indexhtml << "<h1>Plugin Groups</h1>\n";
-	indexhtml << "<ul>\n";
+	indexhtml << "<ul id=\"LinkedList2\" class=\"LinkedList\">\n";
+	//indexhtml << "<ul>";
 	for(map<string, UGRegistryGroup>::iterator it = groups.begin(); it != groups.end(); ++it)
 	{
 		string g = it->first;
 		if(IsPluginGroup(g)==false) continue;
 		string filename = GetFilenameForGroup(g, dir);
-		indexhtml << "<li><a class=\"el\" href=\"" << filename << "\">" << g << "</a>\n";
+		//indexhtml << "<li><a class=\"el\" href=\"" << filename << "\">" << g << "</a>\n";
+		//indexhtml << "<ul><li>test<li>test2<li>test3</ul>";
+		indexhtml << "<li>" << g << "\n";
+		indexhtml << "<ul><li>" << groupsstring[it->first] << "</ul>\n";
 	}
 
 	indexhtml 	<< "</ul>";

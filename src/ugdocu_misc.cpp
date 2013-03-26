@@ -83,6 +83,20 @@ string GetClassGroup(string classname)
 	}
 }
 
+string GetClassGroupStd(string classname)
+{
+	const Registry &reg = GetUGRegistry();
+	const IExportedClass*c = reg.get_class(classname);
+	if(c == NULL) return classname;
+	else
+	{
+		UGDocuClassDescription *d=GetUGDocuClassDescription(classes, c);
+		if(d == NULL || d->group == NULL || d->group->get_default_class() == NULL) return classname;
+		else return d->group->get_default_class()->name();
+	}
+}
+
+
 bool ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, bool bHTML)
 {
 	if(par.is_vector(i)){
@@ -103,6 +117,10 @@ bool ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, b
 		file << "integer ";
 		break;
 
+	case Variant::VT_SIZE_T:
+		file << "size_t ";
+		break;
+
 	case Variant::VT_FLOAT:
 	case Variant::VT_DOUBLE:
 		file << "number ";
@@ -117,7 +135,7 @@ bool ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, b
 		break;
 
 	case Variant::VT_POINTER:
-		if(bHTML)	file << "<a href=\"" << GetClassGroup(par.class_name(i)) << ".html\"" << ">";
+		if(bHTML)	file << "<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">";
 		file << GetClassGroup(par.class_name(i));
 		if(bHTML)	file << "</a>";
 		file << " *";
@@ -125,19 +143,19 @@ bool ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, b
 
 	case Variant::VT_CONST_POINTER:
 		file << "const ";
-		if(bHTML)	file << "<a href=\"" << GetClassGroup(par.class_name(i)) << ".html\"" << ">";
+		if(bHTML)	file << "<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">";
 		file << GetClassGroup(par.class_name(i));
 		if(bHTML)	file << "</a>";
 		file << " *";
 		break;
 
 	case Variant::VT_SMART_POINTER:
-		if(bHTML)	file << "SmartPtr&lt;<a href=\"" << GetClassGroup(par.class_name(i)) << ".html\"" << ">" << GetClassGroup(par.class_name(i)) << "</a>&gt; ";
+		if(bHTML)	file << "SmartPtr&lt;<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">" << GetClassGroup(par.class_name(i)) << "</a>&gt; ";
 		else		file << "SmartPtr<" << GetClassGroup(par.class_name(i)) << "> ";
 		break;
 
 	case Variant::VT_CONST_SMART_POINTER:
-		if(bHTML)	file << "const SmartPtr&lt;<a href=\"" << GetClassGroup(par.class_name(i)) << ".html\"" << ">" << GetClassGroup(par.class_name(i)) << "</a>&gt; ";
+		if(bHTML)	file << "const SmartPtr&lt;<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">" << GetClassGroup(par.class_name(i)) << "</a>&gt; ";
 		else		file << "const SmartPtr<" << GetClassGroup(par.class_name(i)) << "> ";
 		break;
 	}
@@ -153,9 +171,9 @@ void WriteClassHierarchy(ostream &file, ClassHierarchy &c)
 {
 	file << "<li>";
 	if(!c.bGroup)
-		file << "<a class=\"el\" href=\"" << c.name << ".html\">" << c.name << "</a>";
+		file << "<a class=\"el\" href=\"" << c.name << ".html\">" << GetClassGroup(c.name) << "</a>";
 	else
-		file << c.name << " ";
+		file << GetClassGroup(c.name) << " ";
 	if(c.subclasses.size())
 	{
 		file << "<ul>";
