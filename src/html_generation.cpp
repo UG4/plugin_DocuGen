@@ -361,7 +361,7 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 		classhtml << "class has no constructor<br>";
 
 
-	classhtml << "<br>Group <b><a href=\"" << GetFilenameForGroup(c.group(), dir) << "\">" << c.group() << "</a></b><br>";
+	classhtml << "<br>Group <b><a href=\"" << GetFilenameForGroup(c.group()) << "\">" << c.group() << "</a></b><br>";
 
 	classhtml << "<hr>\n";
 
@@ -600,7 +600,7 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 	{
 		string g = it->first;
 		if(IsPluginGroup(g)==true) continue;
-		string filename = GetFilenameForGroup(g, dir);
+		string filename = GetFilenameForGroup(g);
 		if(g.compare("") == 0) g = "(empty group)";
 		//indexhtml << "<li><a class=\"el\" href=\"" << filename << "\">" << g << "</a>\n";
 		indexhtml << "<li>" << g << "\n";
@@ -614,7 +614,7 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 	{
 		string g = it->first;
 		if(IsPluginGroup(g)==false) continue;
-		string filename = GetFilenameForGroup(g, dir);
+		string filename = GetFilenameForGroup(g);
 		//indexhtml << "<li><a class=\"el\" href=\"" << filename << "\">" << g << "</a>\n";
 		//indexhtml << "<ul><li>test<li>test2<li>test3</ul>";
 		indexhtml << "<li>" << g << "\n";

@@ -14,7 +14,7 @@
 namespace ug{
 
 bool IsPluginGroup(std::string g);
-std::string GetFilenameForGroup(std::string s, std::string dir);
+std::string GetFilenameForGroup(std::string s, std::string dir="");
 bool ClassGroupDescSort(const bridge::ClassGroupDesc *i, const bridge::ClassGroupDesc *j);
 bool ExportedClassSort(const bridge::IExportedClass *i, const bridge::IExportedClass *j);
 
