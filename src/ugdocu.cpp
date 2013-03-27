@@ -79,7 +79,7 @@ int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 		InitializeEmbeddedPlugins(&bridge::GetUGRegistry(), "(Plugin) ug4/");
 	#else
 		std::string pluginpath = ug::PathProvider::get_path(PLUGIN_PATH);
-		std::cout << "Using Plugin Path " << pluginpath <<"\n");
+		std::cout << "Using Plugin Path " << pluginpath <<"\n";
 		if(!ug::LoadPlugins(pluginpath.c_str(), "(Plugin) ug4/"))
 		{
 			success &= false;
