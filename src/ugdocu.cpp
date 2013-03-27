@@ -75,14 +75,19 @@ int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 
 #ifdef UG_PLUGINS
 	#ifdef UG_EMBEDDED_PLUGINS
+		std::cout << "Using Embedded Plugins.\n");
 		InitializeEmbeddedPlugins(&bridge::GetUGRegistry(), "(Plugin) ug4/");
 	#else
-		if(!ug::LoadPlugins(ug::PathProvider::get_path(PLUGIN_PATH).c_str(), "(Plugin) ug4/"))
+		std::string pluginpath = ug::PathProvider::get_path(PLUGIN_PATH);
+		std::cout << "Using Plugin Path " << pluginpath <<"\n");
+		if(!ug::LoadPlugins(pluginpath.c_str(), "(Plugin) ug4/"))
 		{
 			success &= false;
 			UG_LOG("ERROR in UGInit: LoadPlugins failed!\n");
 		}
 	#endif
+#else
+	std::cout << "WARNING: UG_PLUGINS NOT DEFINED!!! Plugins will not be loaded.\n";
 #endif
 	}
 
