@@ -18,14 +18,23 @@
 
 #include "bindings/lua/lua_util.h"
 #include "registry/class_helper.h"
-#include "bridge/bridge.h"
 #include "common/util/parameter_parsing.h"
 #include "compile_info/compile_info.h"
 #include <stdio.h>
 #include <time.h>
-#include "common/util/plugin_util.h"
 #include "ugdocu_misc.h"
 #include "html_generation.h"
+
+#ifdef UG_BRIDGE
+	#include "bridge/bridge.h"
+#endif
+
+#ifdef UG_PLUGINS
+	#include "common/util/plugin_util.h"
+	#ifdef UG_EMBEDDED_PLUGINS
+		#include "embedded_plugins.h"
+	#endif
+#endif
 
 using namespace std;
 using namespace ug;

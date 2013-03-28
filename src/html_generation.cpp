@@ -19,7 +19,13 @@
 #include "bridge/bridge.h"
 #include "common/util/parameter_parsing.h"
 #include "compile_info/compile_info.h"
-#include "common/util/plugin_util.h"
+
+#ifdef UG_PLUGINS
+	#include "common/util/plugin_util.h"
+	#ifdef UG_EMBEDDED_PLUGINS
+		#include "embedded_plugins.h"
+	#endif
+#endif
 
 #include "html_generation.h"
 
