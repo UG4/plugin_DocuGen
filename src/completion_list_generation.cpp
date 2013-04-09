@@ -70,7 +70,7 @@ void WriteConstructorCompleter(ostream &f, string classname, const bridge::Expor
 	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
 		f << "<br>help: " << thefunc.help();
 	if(group.length() != 0)
-		f << "<br>group: <b>" << group << "</b>";
+		f << "<br>Registry Group: <b>" << group << "</b>";
 	f << "\n";
 }
 
@@ -175,7 +175,7 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 		}
 		f << ";\n";
 	}
-	UG_LOG("Wrote " << classesAndGroupsAndImplementations.size() << " classes/groups.\n");
+	UG_LOG("Wrote " << classesAndGroupsAndImplementations.size() << " classes/classgroups.\n");
 
 	for(size_t i=0; i<reg.num_functions(); i++)
 	{
@@ -189,7 +189,7 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 	if(bSilent)
 	{
 		GetLogAssistant().enable_terminal_output(true);
-		cout << "Wrote ug4 completion file to " << ug4CompletionFile << ", " << classesAndGroupsAndImplementations.size() << " classes/groups, " << reg.num_functions() << " global functions.\n";
+		cout << "Wrote ug4 completion file to " << ug4CompletionFile << ", " << classesAndGroupsAndImplementations.size() << " classes/classgroups, " << reg.num_functions() << " global functions.\n";
 		GetLogAssistant().enable_terminal_output(false);
 	}
 }
@@ -213,7 +213,7 @@ void WriteFunctionHTMLCompleter(ostream &file, const bridge::ExportedFunctionBas
 		file << "<br>help: " << thefunc.help();
 
 	if(group != NULL)
-		file << "<br>group: <b>" << group << "</b>";
+		file << "<br>Registry Group: <b>" << group << "</b>";
 }
 
 
@@ -226,14 +226,18 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 		pC = d->group->get_default_class();
 		if(pC == NULL)
 		{
-			classhtml << "Group <b>" << d->group->name() << "</b> has no default implementation.";
+			classhtml << "Classgroup <b>" << d->group->name() << "</b> has no default implementation.";
 			return;
 		}
-		classhtml << "Class <b>" << pC->name() << "</b>, default implementation of group <b>"
+		classhtml << "Class <b>" << pC->name() << "</b>, default implementation of classgroup <b>"
 				<< d->group->name() << "</b><br>";
 	}
 	else if(d->group != NULL)
-		classhtml << "Group <b>" << d->group->name() << "</b><br>";
+		classhtml << "Classgroup <b>" << d->group->name() << "</b><br>";
+
+	classhtml << "Registry Group: <b>" << pC->group() << "</b><br>";
+
+
 
 	if(pC->is_instantiable())
 		classhtml << "class has constructor. ";

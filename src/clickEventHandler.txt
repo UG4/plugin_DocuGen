@@ -1,5 +1,4 @@
-// 
- <script type="text/JavaScript">
+<script type="text/JavaScript">
     // Add this to the onload event of the BODY element
     function addEvents() {
       activateTree(document.getElementById("LinkedList1"));

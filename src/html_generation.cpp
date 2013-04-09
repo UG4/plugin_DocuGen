@@ -81,7 +81,7 @@ void WriteHeader(fstream &file, const string &title)
 	file << " | <a class=\"qindex\" href=\"groupindex.html\">Class Index by Group</a>";
 	file << " | <a class=\"qindex\" href=\"functions.html\">Global Functions</a>";
 	file << " | <a class=\"qindex\" href=\"groupedfunctions.html\">Global Functions by Group</a>";
-	file << " | <a class=\"qindex\" href=\"groups_index.html\">Groups</a>";
+	file << " | <a class=\"qindex\" href=\"groups_index.html\">Registry Groups and Plugins</a> |";
 	file << "</div>" << endl;
 }
 
@@ -356,7 +356,7 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 		classhtml << "<h1>" << d->group->name() << " Class Reference</h1>";
 		classhtml << name << "<br>" << d->tag << "<br>";
 		if(d->group->get_default_class() == d->c)
-			classhtml << "(default implementation of group " << d->group->name() << ")<br>";
+			classhtml << "(default implementation of classgroup " << d->group->name() << ")<br>";
 	}
 
 	if(c.tooltip().size() != 0)
@@ -367,7 +367,7 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 		classhtml << "class has no constructor<br>";
 
 
-	classhtml << "<br>Group <b><a href=\"" << GetFilenameForGroup(c.group()) << "\">" << c.group() << "</a></b><br>";
+	classhtml << "<br>Registry Group <b><a href=\"" << GetFilenameForGroup(c.group()) << "\">" << c.group() << "</a></b><br>";
 
 	classhtml << "<hr>\n";
 
