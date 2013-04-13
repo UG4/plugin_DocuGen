@@ -1,5 +1,5 @@
 /**
- * \file /ug4svn/apps/ugdocu/src/ugdocu_misc.h
+ * \file apps/ugdocu/src/ugdocu_misc.h
  *
  *  \date	 	25.03.2013
  *  \author 	mrupp

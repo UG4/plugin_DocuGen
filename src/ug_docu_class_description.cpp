@@ -1,5 +1,5 @@
 /**
- * \file /ug4svn/apps/ugdocu/src/UGDocuClassDescription.cpp
+ * \file apps/ugdocu/src/ug_docu_class_description.cpp
  *
  *  \date	 	25.03.2013
  *  \author 	mrupp

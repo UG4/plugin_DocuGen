@@ -1,5 +1,5 @@
 /**
- * \file createdocu.cpp
+ * \file apps/ugdocu/src/ugdocu.cpp
  *
  * \author Martin Rupp
  *

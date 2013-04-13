@@ -1,5 +1,5 @@
 /**
- * \file /ug4svn/apps/ugdocu/src/html_generation.cpp
+ * \file apps/ugdocu/src/html_generation.cpp
  *
  *  \date	 	25.03.2013
  *  \author 	mrupp
