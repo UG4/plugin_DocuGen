@@ -49,9 +49,18 @@ namespace bridge
 extern bool IsClassInParameters(const bridge::ParameterInfo &par, const char *classname);
 }
 
-
+/**
+ * \brief App for generating documentation of registered classes and methods
+ * \details This app generates the documentation of all registered classes and 
+ *   methods of the linked libug4.
+ *   Depending on command line parameters either HTML or C++ files are generated.
+ */
 namespace regDocu
 {
+
+/// \defgroup apps_ugdocu UGRegistry Documentation
+/// \ingroup apps
+/// \{
 
 void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations, bool bSilent, ClassHierarchy &hierarchy);
 
@@ -108,9 +117,13 @@ vector<UGDocuClassDescription> classes;
 vector<UGDocuClassDescription> classesAndGroups;
 vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 
+// end group apps_ugdocu
+/// \}
+
 }	// namespace regDocu
 }	// namespace ug
 
+/// \addtogroup apps_ugdocu
 int main(int argc, char* argv[])
 {
 	regDocu::MyUGInit(&argc, &argv);

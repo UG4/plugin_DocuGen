@@ -39,6 +39,9 @@ namespace ug
 namespace regDocu
 {
 
+/// \addtogroup apps_ugdocu
+/// \{
+
 void WriteConstructorCompleter(ostream &f, string classname, const bridge::ExportedConstructor &thefunc,
 		string group);
 
@@ -305,6 +308,9 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 	}
 	classhtml << "</table>";
 }
+
+// end group apps_ugdocu
+/// \}
 
 }	// namespace regDocu
 }	// namespace ug

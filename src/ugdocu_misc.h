@@ -16,6 +16,9 @@ namespace ug
 namespace regDocu
 {
 
+/// \addtogroup apps_ugdocu
+/// \{
+
 bool IsPluginGroup(std::string g);
 std::string GetFilenameForGroup(std::string s, std::string dir="");
 bool ClassGroupDescSort(const bridge::ClassGroupDesc *i, const bridge::ClassGroupDesc *j);
@@ -83,6 +86,8 @@ public:
 
 std::string GetBeautifiedTag(std::string tag);
 
+// end group apps_ugdocu
+/// \}
 
 }	// namespace regDocu
 }	// namespace ug

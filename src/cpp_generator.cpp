@@ -1,5 +1,7 @@
-/*
- *
+/**
+ * \file apps/ugdocu/src/cpp_generator.cpp
+ * \author Torbjörn Klatt
+ * \date 2013-04-23
  */
 
 #include "cpp_generator.h"
@@ -54,7 +56,10 @@ void CppGenerator::generate_cpp_files()
 			string class_id = name_to_id( m_curr_class->name() );
 			string file_name = string( m_output_dir ).append( class_id ).append( ".cpp" );
 			m_curr_file.open( file_name.c_str(), ios::out );
-			UG_LOG( "  Writing class " << m_curr_class->name() << " to '" << file_name << "'." << endl );
+			if ( !m_silent ) {
+				UG_LOG( "  Writing class " << m_curr_class->name() << " to '" 
+				        << file_name << "'." << endl );
+			}
 			m_curr_file << "namespace ug4bridge {" << endl;
 			generate_class_docu();
 			generate_class_cpp();
@@ -63,7 +68,10 @@ void CppGenerator::generate_cpp_files()
 			m_curr_file.close();
 			++count_new_classes;
 		} else {
-// 			UG_LOG( "  Class '" << m_curr_class->name() << "' already written to '" m_written_classes.at( m_curr_class->name() ) << "'." << endl );
+			if ( !m_silent ) {
+				UG_LOG( "  Class '" << m_curr_class->name() << "' already written to '" 
+				        << m_written_classes.at( m_curr_class->name() ) << "'." << endl );
+			}
 		}
 	}
 	UG_LOG( count_new_classes << " additional classes written." << endl );
@@ -233,6 +241,7 @@ void CppGenerator::generate_class_public_methods()
 void CppGenerator::generate_class_public_members()
 {
 	m_curr_file << endl << "public:" << endl;
+	//TODO implement handling of public member variables of registered classes (if applicable)
 }
 
 template< class TEntity >
@@ -267,24 +276,6 @@ void CppGenerator::write_generic_function( const TFunction &function )
 	generate_parameter_list( function );
 }
 
-string CppGenerator::generate_return_value( const bridge::ExportedFunctionBase &method )
-{
-	const bridge::ParameterInfo param_out = method.params_out();
-	if ( param_out.size() == 1 ) {
-		// exactly one return value
-		m_curr_file << "/// \\returns " << sanitize_docu( method.return_info(0) ) << endl;
-		return bridge::ParameterToString( param_out, 0 );
-	} else if ( param_out.size() > 1 ) {
-		// more than one return value
-		UG_WARNING( "Multiple return values not yet implemented in C++Generator."
-		            << " Displaying as '()'." );
-		return "()";
-	} else {
-		// no return value (i.e. void)
-		return string("void");
-	}
-}
-
 template< class TFunction >
 void CppGenerator::generate_parameter_list( const TFunction &func )
 {
@@ -299,6 +290,25 @@ void CppGenerator::generate_parameter_list( const TFunction &func )
 		            << " " << sanitize_parameter_name( func.parameter_name( i_last_param ) );
 	}
 	m_curr_file << ")";
+}
+
+string CppGenerator::generate_return_value( const bridge::ExportedFunctionBase &method )
+{
+	const bridge::ParameterInfo param_out = method.params_out();
+	if ( param_out.size() == 1 ) {
+		// exactly one return value
+		m_curr_file << "/// \\returns " << sanitize_docu( method.return_info(0) ) << endl;
+		return bridge::ParameterToString( param_out, 0 );
+	} else if ( param_out.size() > 1 ) {
+		// more than one return value
+		//TODO implement handling of multiple return values
+		UG_WARNING( "Multiple return values not yet implemented in C++Generator."
+		            << " Displaying as '()'." );
+		return "()";
+	} else {
+		// no return value (i.e. void)
+		return string("void");
+	}
 }
 
 string CppGenerator::name_to_id( const string &str )

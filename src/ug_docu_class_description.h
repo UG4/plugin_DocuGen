@@ -20,6 +20,7 @@ namespace ug
 namespace regDocu
 {
 
+/// \addtogroup apps_ugdocu
 class UGDocuClassDescription
 {
 public:

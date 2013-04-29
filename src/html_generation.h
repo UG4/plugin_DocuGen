@@ -19,6 +19,9 @@ namespace ug
 namespace regDocu
 {
 
+/// \addtogroup apps_ugdocu
+/// \{
+
 void WriteHeader(std::fstream &file, const std::string &title);
 void WriteFooter(std::fstream &file);
 void WriteUGDocuCSS(const char *dir);
@@ -35,6 +38,9 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 //void WriteGlobalFunctions(const char *dir, const char *filename, bool sortFunction(const bridge::ExportedFunction *,const bridge::ExportedFunction *j));
 
 void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups, const char *dir, bridge::ClassHierarchy &hierarchy);
+
+// end group apps_ugdocu
+/// \}
 
 }	// namespace regDocu
 }	// namespace ug
