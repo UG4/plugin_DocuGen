@@ -7,7 +7,6 @@
 #ifndef __UG__REGDOCU__CPP_GENERATOR_H
 #define __UG__REGDOCU__CPP_GENERATOR_H
 
-#include <memory> // std::shared_ptr
 #include <vector> // std::vector
 #include <map>    // std::map
 #include <string> // std::string
@@ -139,16 +138,17 @@ class CppGenerator
 		 *   - `ParameterInfo params_in()`
 		 *   - `string parameter_name( size_t i )`
 		 * \param function function to be written
+		 * \param constant whether the function is const or not
 		 */
 		template< class TFunction >
-		void write_generic_function( const TFunction &function );
+		void write_generic_function( const TFunction &function, bool constant=false );
 		/// \}
 		
 		/// \{
 		/**
 		 * \brief Generates parameter list for the given function
 		 * \details Generates the parameter list as in function declerations for the
-		 *   given registered method and writes it at the end of m_curr_file.
+		 *   given registered method.
 		 *   The enclosing brakets ('(' and ')') are also written.
 		 * \tparam TFunction a function type usually either derived from 
 		 *   ug::bridge::ExportedFunctionBase or ug::bridge::ExportedConstructor 
@@ -157,9 +157,10 @@ class CppGenerator
 		 *   - `ParameterInfo params_in()`
 		 *   - `string parameter_name( size_t i )`
 		 * \param func method object to be used
+		 * \returns parameter list
 		 */
 		template< class TFunction >
-		void generate_parameter_list( const TFunction &func );
+		string generate_parameter_list( const TFunction &func );
 		/**
 		 * \brief Writes docu on return value and returns return value as string
 		 * \details Documentation on the return value of the given function \c method
@@ -172,6 +173,8 @@ class CppGenerator
 		 * \returns the return value of \c func as a string
 		 * \todo Implement handling of multiple return values. Currently they are 
 		 *   displayed as '()'.
+		 *   This might be superfluous if there are no methods with more than one
+		 *   return value registered.
 		 */
 		string generate_return_value( const bridge::ExportedFunctionBase &method );
 		/// \}
@@ -214,6 +217,15 @@ class CppGenerator
 		 * \returns vector of strings of tokens
 		 */
 		vector<string> split_group_hieararchy( const string group );
+		/**
+		 * \brief Converts group hierarchy into namespaces and writes them to file
+		 * \details Creates a namespace for each element of the group vector while
+		 *   empty group names are ignored and the group name \em ug4 is replaced
+		 *   by \em ug4bridge .
+		 * \param group_hierarchy vector of groups as returned by split_group_hieararchy(group)
+		 * \returns string with the closing namespace brackets
+		 */
+		string write_group_namespaces( vector<string> group_hierarchy );
 		/// \}
 		
 	private:
@@ -226,6 +238,8 @@ class CppGenerator
 		bridge::IExportedClass *m_curr_class;
 		/// \brief Pointer to the currently processed group (if applicable)
 		bridge::ClassGroupDesc *m_curr_group;
+		/// \brief Name of current group as in \ug4 itself (including namespaces)
+		string m_curr_group_name;
 		
 		/// \brief Map for keeping track of already processed classes
 		/// \details Key is the class name, which maps to the file name this class

@@ -51,16 +51,36 @@ extern bool IsClassInParameters(const bridge::ParameterInfo &par, const char *cl
 
 /**
  * \brief App for generating documentation of registered classes and methods
- * \details This app generates the documentation of all registered classes and 
- *   methods of the linked libug4.
- *   Depending on command line parameters either HTML or C++ files are generated.
  */
 namespace regDocu
 {
 
-/// \defgroup apps_ugdocu UGRegistry Documentation
-/// \ingroup apps
-/// \{
+/**
+ * \defgroup apps_ugdocu UGRegistry Documentation
+ * \ingroup apps
+ * \brief App for generating documentation of registered classes and methods
+ * \details This app generates the documentation of all registered classes and 
+ *   methods of the linked libug4.
+ *   Depending on command line parameters either HTML or C++ files are generated.
+ * 
+ *   <b>Usage:</b>
+ *   
+ *       ugdocu -d <path> [-html] [-cpp] [-list] [-silent]
+ *   
+ *   <b>Parameters:</b>
+ *   - `-d` (required)<br />
+ *     path of the output directory for the html, cpp files and completion list
+ *   - `-html` (optional)<br />
+ *     generates legacy HTML docu
+ *   - `-cpp` (optional)<br />
+ *     generates dummy C++ code from registered functions ready to be parsed
+ *     by Doxygen
+ *   - `-list` (optional)<br />
+ *     generates completion list
+ *   - `-silent` (optional)<br />
+ *     don't print verbose progress info; only warnings
+ * \{
+ */
 
 void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations, bool bSilent, ClassHierarchy &hierarchy);
 
@@ -137,9 +157,7 @@ int main(int argc, char* argv[])
 	LOG("* arguments:\n");
 	LOG("*   -d       output directory for the html/c++ files\n");
 	LOG("*   -html    generate legacy HTML bridge docu\n");
-// #ifdef UG_CXX11
 	LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
-// #endif
 	LOG("*   -list    generate completion list\n");
 	LOG("*   -silent  don't print verbose progress info\n");
 	LOG("****************************************************************\n");
@@ -155,9 +173,7 @@ int main(int argc, char* argv[])
 	const char *dir = s_dir.c_str();
 	
 	bool generate_html = FindParam( "-html", argc, argv );
-// #ifdef UG_CXX11
 	bool generate_cpp = FindParam( "-cpp", argc, argv );
-// #endif
 	bool generate_list = FindParam( "-list", argc, argv );
 	
 	bool silent = FindParam( "-silent", argc, argv );
@@ -192,13 +208,11 @@ int main(int argc, char* argv[])
 		regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir, hierarchy);
 	}
 	
-// #ifdef UG_CXX11
 	if ( generate_cpp ) {
 		// Write C++ files
 		regDocu::CppGenerator cppgen( dir, silent );
 		cppgen.generate_cpp_files();
 	}
-// #endif
 
 	if ( generate_list ) {
 		regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
