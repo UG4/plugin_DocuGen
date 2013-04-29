@@ -14,7 +14,10 @@
 #include "ug_docu_class_description.h"
 #include "registry/class_helper.h"
 
-namespace ug{
+namespace ug
+{
+namespace regDocu
+{
 
 void WriteHeader(std::fstream &file, const std::string &title);
 void WriteFooter(std::fstream &file);
@@ -33,6 +36,7 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 
 void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups, const char *dir, bridge::ClassHierarchy &hierarchy);
 
-} // namespace ug
+}	// namespace regDocu
+}	// namespace ug
 
 #endif /* __UG__HTML_GENERATION_H__ */

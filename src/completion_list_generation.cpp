@@ -34,7 +34,10 @@ using namespace ug;
 using namespace bridge;
 
 
-namespace ug{
+namespace ug
+{
+namespace regDocu
+{
 
 void WriteConstructorCompleter(ostream &f, string classname, const bridge::ExportedConstructor &thefunc,
 		string group);
@@ -133,9 +136,9 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 		f << "class\n" << classesAndGroupsAndImplementations[i].name() << "\n";
 
 		// class hierachy
-		const IExportedClass *c = classesAndGroupsAndImplementations[i].c;
+		const IExportedClass *c = classesAndGroupsAndImplementations[i].mp_class;
 		if(c == NULL)
-			c = classesAndGroupsAndImplementations[i].group->get_default_class();
+			c = classesAndGroupsAndImplementations[i].mp_group->get_default_class();
 
 		// inheritance
 		if(c != NULL)
@@ -184,7 +187,7 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 			WriteFunctionCompleter(f, "function", *fg.get_overload(j), fg.get_overload(j)->group(), NULL, false);
 	}
 	UG_LOG("Wrote " << reg.num_functions() << " global functions.\n");
-	UG_LOG("done!");
+	UG_LOG("done!\n");
 
 	if(bSilent)
 	{
@@ -220,20 +223,20 @@ void WriteFunctionHTMLCompleter(ostream &file, const bridge::ExportedFunctionBas
 void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
 {
 	Registry &reg = GetUGRegistry();
-	const IExportedClass *pC = d->c;
+	const IExportedClass *pC = d->mp_class;
 	if(pC == NULL)
 	{
-		pC = d->group->get_default_class();
+		pC = d->mp_group->get_default_class();
 		if(pC == NULL)
 		{
-			classhtml << "Classgroup <b>" << d->group->name() << "</b> has no default implementation.";
+			classhtml << "Classgroup <b>" << d->mp_group->name() << "</b> has no default implementation.";
 			return;
 		}
 		classhtml << "Class <b>" << pC->name() << "</b>, default implementation of classgroup <b>"
-				<< d->group->name() << "</b><br>";
+				<< d->mp_group->name() << "</b><br>";
 	}
-	else if(d->group != NULL)
-		classhtml << "Classgroup <b>" << d->group->name() << "</b><br>";
+	else if(d->mp_group != NULL)
+		classhtml << "Classgroup <b>" << d->mp_group->name() << "</b><br>";
 
 	classhtml << "Registry Group: <b>" << pC->group() << "</b><br>";
 
@@ -303,4 +306,5 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 	classhtml << "</table>";
 }
 
-}
+}	// namespace regDocu
+}	// namespace ug

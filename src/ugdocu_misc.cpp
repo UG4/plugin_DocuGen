@@ -22,11 +22,15 @@ using namespace std;
 using namespace ug;
 using namespace bridge;
 
-extern std::vector<UGDocuClassDescription> classes;
-extern std::vector<UGDocuClassDescription> classesAndGroups;
-extern std::vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 
-namespace ug{
+namespace ug
+{
+namespace regDocu
+{
+
+extern vector<UGDocuClassDescription> classes;
+extern vector<UGDocuClassDescription> classesAndGroups;
+extern vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 
 bool IsPluginGroup(string g)
 {
@@ -78,8 +82,8 @@ string GetClassGroup(string classname)
 	else
 	{
 		UGDocuClassDescription *d=GetUGDocuClassDescription(classes, c);
-		if(d == NULL || d->group == NULL) return classname;
-		else return d->group->name();
+		if(d == NULL || d->mp_group == NULL) return classname;
+		else return d->mp_group->name();
 	}
 }
 
@@ -91,8 +95,8 @@ string GetClassGroupStd(string classname)
 	else
 	{
 		UGDocuClassDescription *d=GetUGDocuClassDescription(classes, c);
-		if(d == NULL || d->group == NULL || d->group->get_default_class() == NULL) return classname;
-		else return d->group->get_default_class()->name();
+		if(d == NULL || d->mp_group == NULL || d->mp_group->get_default_class() == NULL) return classname;
+		else return d->mp_group->get_default_class()->name();
 	}
 }
 
@@ -193,7 +197,5 @@ string GetBeautifiedTag(string tag)
 }
 
 
-
-} // namespace ug
-
-
+}	// namespace regDocu
+}	// namespace ug

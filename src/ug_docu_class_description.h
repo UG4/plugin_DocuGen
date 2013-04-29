@@ -15,45 +15,46 @@
 #ifndef __UG__UGDOCUCLASSDESCRIPTION_H__
 #define __UG__UGDOCUCLASSDESCRIPTION_H__
 
-namespace ug {
+namespace ug
+{
+namespace regDocu
+{
 
 class UGDocuClassDescription
 {
 public:
-	UGDocuClassDescription(const bridge::IExportedClass *_c)
-	{
-		c = _c;
-		group = NULL;
-	}
+	UGDocuClassDescription(const bridge::IExportedClass *klass) :
+		  mp_class( klass )
+		, mp_group( NULL )
+	{}
 
-	UGDocuClassDescription(const bridge::ClassGroupDesc *_group)
-	{
-		group = _group;
-		c = NULL;
-	}
+	UGDocuClassDescription(const bridge::ClassGroupDesc *group) :
+		  mp_class( NULL )
+		, mp_group( group )
+	{}
 
-	std::string name() const
+	const std::string name() const
 	{
-		if(c) return c->name();
-		else if(group) return group->name();
+		if(mp_class) return mp_class->name();
+		else if(mp_group) return mp_group->name();
 		else return " ";
 	}
 
-	std::string group_str() const
+	const std::string group_str() const
 	{
-		if(c) return c->group();
-		if(group)
+		if(mp_class) return mp_class->group();
+		if(mp_group)
 		{
-			if(group->get_default_class()) return group->get_default_class()->group();
-			else if(group->num_classes() > 0) return group->get_class(0)->group();
+			if(mp_group->get_default_class()) return mp_group->get_default_class()->group();
+			else if(mp_group->num_classes() > 0) return mp_group->get_class(0)->group();
 			else return " ";
 		}
 		else return " ";
 	}
 
 
-	const bridge::IExportedClass *c;
-	const bridge::ClassGroupDesc *group;
+	const bridge::IExportedClass *mp_class;
+	const bridge::ClassGroupDesc *mp_group;
 	std::string tag;
 };
 
@@ -65,6 +66,7 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations );
 
 
-} // namespace ug
+}	// namespace regDocu
+}	// namespace ug
 
 #endif /* __UG__UGDOCUCLASSDESCRIPTION_H__ */

@@ -11,7 +11,10 @@
 #include "ug_docu_class_description.h"
 #include "registry/class_helper.h"
 
-namespace ug{
+namespace ug
+{
+namespace regDocu
+{
 
 bool IsPluginGroup(std::string g);
 std::string GetFilenameForGroup(std::string s, std::string dir="");
@@ -81,7 +84,7 @@ public:
 std::string GetBeautifiedTag(std::string tag);
 
 
-
-} // namespace ug
+}	// namespace regDocu
+}	// namespace ug
 
 #endif /* __UG__UGDOCU_MISC_H__ */

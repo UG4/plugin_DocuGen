@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <sstream>
-
 #include <string>
 
 #include "ug.h"
@@ -20,21 +19,21 @@
 #include "registry/class_helper.h"
 #include "common/util/parameter_parsing.h"
 #include "compile_info/compile_info.h"
-#include <stdio.h>
-#include <time.h>
-#include "ugdocu_misc.h"
-#include "html_generation.h"
 
 #ifdef UG_BRIDGE
-	#include "bridge/bridge.h"
+# include "bridge/bridge.h"
 #endif
 
 #ifdef UG_PLUGINS
-	#include "common/util/plugin_util.h"
-	#ifdef UG_EMBEDDED_PLUGINS
-		#include "embedded_plugins.h"
-	#endif
+# include "common/util/plugin_util.h"
+# ifdef UG_EMBEDDED_PLUGINS
+#  include "embedded_plugins.h"
+# endif
 #endif
+
+#include "ugdocu_misc.h"
+#include "html_generation.h"
+#include "cpp_generator.h"
 
 using namespace std;
 using namespace ug;
@@ -42,18 +41,19 @@ using namespace bridge;
 
 
 
-namespace ug {
+namespace ug
+{
 
 namespace bridge
 {
 extern bool IsClassInParameters(const bridge::ParameterInfo &par, const char *classname);
 }
 
+
+namespace regDocu
+{
+
 void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations, bool bSilent, ClassHierarchy &hierarchy);
-
-} // namespace ug
-
-
 
 int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 {
@@ -104,67 +104,93 @@ int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 	return !success;
 }
 
-std::vector<UGDocuClassDescription> classes;
-std::vector<UGDocuClassDescription> classesAndGroups;
-std::vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
+vector<UGDocuClassDescription> classes;
+vector<UGDocuClassDescription> classesAndGroups;
+vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
+
+}	// namespace regDocu
+}	// namespace ug
 
 int main(int argc, char* argv[])
 {
-	MyUGInit(&argc, &argv);
+	regDocu::MyUGInit(&argc, &argv);
 	if(FindParam("-silent", argc, argv))
 		GetLogAssistant().enable_terminal_output(false);
 
 	ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
 
 	LOG("****************************************************************\n");
-	LOG("* ugdocu - v0.1.1\n");
+	LOG("* ugdocu - v0.2.0\n");
 	LOG("* arguments:\n");
-	LOG("*   -d directory.\toutput directory for the html files\n");
+	LOG("*   -d       output directory for the html/c++ files\n");
+	LOG("*   -html    generate legacy HTML bridge docu\n");
+// #ifdef UG_CXX11
+	LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
+// #endif
+	LOG("*   -list    generate completion list\n");
+	LOG("*   -silent  don't print verbose progress info\n");
 	LOG("****************************************************************\n");
 
-
-
-	GetGroups(classes, classesAndGroups, classesAndGroupsAndImplementations);
-
-
-
+	const char* baseDir = NULL;
+	if ( ! ParamToString( &baseDir, "-d", argc, argv ) ) {
+		UG_THROW( "No output directory given. Mandatory. Abborting!" );
+	}
+	string s_dir = baseDir;
+	if ( baseDir[strlen(baseDir)-1] != '/' ) {
+		s_dir.append( "/" );
+	}
+	const char *dir = s_dir.c_str();
+	
+	bool generate_html = FindParam( "-html", argc, argv );
+// #ifdef UG_CXX11
+	bool generate_cpp = FindParam( "-cpp", argc, argv );
+// #endif
+	bool generate_list = FindParam( "-list", argc, argv );
+	
+	bool silent = FindParam( "-silent", argc, argv );
+	
+	if ( generate_html || generate_list ) {
+		regDocu::GetGroups(regDocu::classes, regDocu::classesAndGroups, regDocu::classesAndGroupsAndImplementations);
+	}
+	
 	Registry &reg = GetUGRegistry();
-	// init registry with cpualgebra and dim == 2
+	ClassHierarchy hierarchy;
+	
+	// 	init registry with cpualgebra and dim == 2
 #if defined UG_CPU_1
 	AlgebraType algebra("CPU", 1);
 #elif defined UG_CRS_1
-    AlgebraType algebra("CRS", 1);
+	AlgebraType algebra("CRS", 1);
 #else
-#error "no suitable algebra found"
+# error "No suitable Algebra found."
 #endif
 	const int dim = 2;
 	InitUG(dim, algebra);
 
-	ClassHierarchy hierarchy;
-	UG_LOG("GetClassHierarchy... ");
-	GetClassHierarchy(hierarchy, reg);
-	UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
-
-
-	const char* baseDir = NULL;
-	if(ParamToString(&baseDir, "-d", argc, argv))
-	{
-		// Write HTML docu
-		string s_dir = baseDir;
-		if(baseDir[strlen(baseDir)-1]!='/')
-			s_dir.append("/");
-		const char *dir = s_dir.c_str();
-		LOG("Writing html files to \"" << dir << "\"" << endl);
-
-		// get registry
-		WriteHTMLDocu(classes, classesAndGroups, dir, hierarchy);
-
+	if ( generate_html || generate_list ) {
+		GetClassHierarchy( hierarchy, reg );
+		UG_LOG("GetClassHierarchy... ");
+		UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
 	}
+	
+	if ( generate_html ) {
+		// Write HTML docu
+		LOG("Writing html files to \"" << dir << "\"" << endl);
+		regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir, hierarchy);
+	}
+	
+// #ifdef UG_CXX11
+	if ( generate_cpp ) {
+		// Write C++ files
+		regDocu::CppGenerator cppgen( dir, silent );
+		cppgen.generate_cpp_files();
+	}
+// #endif
 
-	WriteCompletionList(classesAndGroupsAndImplementations, FindParam("-silent", argc, argv), hierarchy);
-
+	if ( generate_list ) {
+		regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
+	}
 	
 	UGFinalize();
 	return 0;
 }
-

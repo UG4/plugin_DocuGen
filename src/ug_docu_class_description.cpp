@@ -11,11 +11,15 @@ using namespace std;
 using namespace ug;
 using namespace bridge;
 
-extern std::vector<UGDocuClassDescription> classes;
-extern std::vector<UGDocuClassDescription> classesAndGroups;
-extern std::vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 
-namespace ug {
+namespace ug
+{
+namespace regDocu
+{
+
+extern vector<UGDocuClassDescription> classes;
+extern vector<UGDocuClassDescription> classesAndGroups;
+extern vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 
 bool NameSortFunction(const UGDocuClassDescription &i, const UGDocuClassDescription &j)
 {
@@ -35,7 +39,7 @@ UGDocuClassDescription *GetUGDocuClassDescription(std::vector<UGDocuClassDescrip
 {
 	UGDocuClassDescription desc(c);
 	std::vector<UGDocuClassDescription>::iterator it = lower_bound(classes.begin(), classes.end(), desc, NameSortFunction);
-	if(it != classes.end() && (*it).c == c)
+	if(it != classes.end() && (*it).mp_class == c)
 		return &*it;
 	else return NULL;
 	//for(size_t i=0; i<classes.size(); i++)
@@ -94,14 +98,14 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		{
 			//UG_LOG("searching " << g->get_class(j)->name() << "\n");
 			UGDocuClassDescription *d = GetUGDocuClassDescription(classes, g->get_class(j));
-			if(d) { d->group = g; d->tag = g->get_class_tag(j);  }
+			if(d) { d->mp_group = g; d->tag = g->get_class_tag(j);  }
 			//else UG_LOG("not found.\n");
 		}
 	}
 
 	for(size_t i=0; i<classes.size(); ++i)
 	{
-		if(classes[i].group == NULL)
+		if(classes[i].mp_group == NULL)
 			classesAndGroups.push_back(classes[i]);
 	}
 	classesAndGroupsAndImplementations = classes;
@@ -124,4 +128,5 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 	}*/
 }
 
-} // namespace ug
+}	// namespace regDocu
+}	// namespace ug

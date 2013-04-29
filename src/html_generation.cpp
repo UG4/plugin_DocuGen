@@ -39,7 +39,11 @@ using namespace std;
 using namespace ug;
 using namespace bridge;
 
-namespace ug{
+namespace ug
+{
+namespace regDocu
+{
+
 string GetClassGroup(string classname);
 template<typename T>
 void remove_doubles(vector<T> &v)
@@ -343,20 +347,20 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 {
 	Registry &reg = GetUGRegistry();
 
-	const IExportedClass &c = *d->c;
+	const IExportedClass &c = *d->mp_class;
 	string name = c.name();
 
 	fstream classhtml((string(dir) + name + ".html").c_str(), ios::out);
 	WriteHeader(classhtml, name);
 
-	if(d->group == NULL)
+	if(d->mp_group == NULL)
 		classhtml 	<< "<h1>" << name << " Class Reference</h1>";
 	else
 	{
-		classhtml << "<h1>" << d->group->name() << " Class Reference</h1>";
+		classhtml << "<h1>" << d->mp_group->name() << " Class Reference</h1>";
 		classhtml << name << "<br>" << d->tag << "<br>";
-		if(d->group->get_default_class() == d->c)
-			classhtml << "(default implementation of classgroup " << d->group->name() << ")<br>";
+		if(d->mp_group->get_default_class() == d->mp_class)
+			classhtml << "(default implementation of classgroup " << d->mp_group->name() << ")<br>";
 	}
 
 	if(c.tooltip().size() != 0)
@@ -374,9 +378,9 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 	classhtml << "<a href=\"http://cave1.gcsc.uni-frankfurt.de/job/ug-doc/doxygen/"
 			"classug_1_1";
 	string groupname;
-	if(d->group == NULL)
+	if(d->mp_group == NULL)
 		groupname = name;
-	else groupname = d->group->name();
+	else groupname = d->mp_group->name();
 	for(uint i=0; i<groupname.size(); i++)
 	{
 		if(groupname[i] >= 'A' && groupname[i] <= 'Z') classhtml << '_' <<
@@ -451,14 +455,14 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 		classhtml << "</ul>";
 	}
 
-	if(d->group != NULL)
+	if(d->mp_group != NULL)
 	{
-		classhtml 	<< "<hr> <h1>Other Implementations of " << d->group->name() << "</h1>";
+		classhtml 	<< "<hr> <h1>Other Implementations of " << d->mp_group->name() << "</h1>";
 		classhtml << "<ul>";
-		for(size_t j=0; j<d->group->num_classes(); j++)
+		for(size_t j=0; j<d->mp_group->num_classes(); j++)
 		{
-			classhtml << "<li>" << "<a class=\"el\" href=\"" << d->group->get_class(j)->name() << ".html\">" << d->group->get_class(j)->name() << "</a> (" << GetBeautifiedTag(d->group->get_class_tag(j)) << ")";
-			if(d->group->get_default_class() == d->group->get_class(j))
+			classhtml << "<li>" << "<a class=\"el\" href=\"" << d->mp_group->get_class(j)->name() << ".html\">" << d->mp_group->get_class(j)->name() << "</a> (" << GetBeautifiedTag(d->mp_group->get_class_tag(j)) << ")";
+			if(d->mp_group->get_default_class() == d->mp_group->get_class(j))
 				classhtml << " (default)";
 			classhtml << "\n";
 		}
@@ -505,9 +509,9 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		indexhtml << " ";
 		indexhtml << "</td>";
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
-		if(c.c == NULL) // group
+		if(c.mp_class == NULL) // group
 		{
-			indexhtml << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->name() << "</a>\n";
+			indexhtml << "<a class=\"el\" href=\"" << c.mp_group->get_default_class()->name() << ".html\">" << c.mp_group->name() << "</a>\n";
 			/*indexhtml << "<p> <font size=\"1\">\n";
 			indexhtml << "<ul>";
 			for(size_t j=0; j<c.group->num_classes(); j++)
@@ -568,8 +572,8 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 			ss << " ";
 			ss << "</td>";
 			ss << "<td class=\"memItemRight\" valign=bottom>";
-			if(c.c == NULL) // group
-				ss << "<a class=\"el\" href=\"" << c.group->get_default_class()->name() << ".html\">" << c.group->name() << "</a>\n";
+			if(c.mp_class == NULL) // group
+				ss << "<a class=\"el\" href=\"" << c.mp_group->get_default_class()->name() << ".html\">" << c.mp_group->name() << "</a>\n";
 			else
 				ss << "<a class=\"el\" href=\"" << c.name() << ".html\">" << c.name() << "</a>";
 			ss << "</td></tr>\n";
@@ -692,5 +696,5 @@ void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGD
 	UG_LOG("done." << endl);
 }
 
-
-} // namespace ug
+}	// namespace regDocu
+}	// namespace ug
