@@ -9,6 +9,7 @@
 
 #include <vector> // std::vector
 #include <map>    // std::map
+#include <set>    // std::set
 #include <string> // std::string
 
 #ifdef UG_BRIDGE
@@ -16,6 +17,7 @@
 #endif
 #include "registry/registry.h"
 #include "registry/class_helper.h"
+#include "class_hierarchy_provider.h"
 
 namespace ug
 {
@@ -41,7 +43,11 @@ class CppGenerator
 		 * \param dir     name and path of output directory for generated C++ files
 		 * \param silent  flag for suppressing verbose logging
 		 */
-		CppGenerator( const string dir, bool silent=false );
+		CppGenerator( const string dir, ClassHierarchyProvider &chp, bool silent=false );
+		/**
+		 * \brief Destructor
+		 * \details if the file stream is still open, it closes it
+		 */
 		~CppGenerator();
 		
 		/**
@@ -142,6 +148,11 @@ class CppGenerator
 		 */
 		template< class TFunction >
 		void write_generic_function( const TFunction &function, bool constant=false );
+		/**
+		 * \brief Writes some general docu on parent namespace
+		 * \details also warning for the plugin namespace
+		 */
+		void write_group_definitions();
 		/// \}
 		
 		/// \{
@@ -185,11 +196,19 @@ class CppGenerator
 		 * \details It
 		 *   - deletes all whitespaces
 		 *   - replaces all occurrences of '/' by '_'
-		 *   - transforms all characters to their lower case equivalents
 		 * \param str initial name to convert
 		 * \returns converted name
 		 */
-		string name_to_id( const string& str );
+		inline string name_to_id( const string& str );
+		/**
+		 * \brief Converts a value type to a string representation
+		 * \details \ug4's internal classes are correctly substituted as well
+		 *   as other registered classes and types.
+		 * \param[in] par  parameter stack
+		 * \param[in] i    index of the parameter from the parameter stack
+		 * \return string representation of the i'th parameter type
+		 */
+		string parameter_to_string( const bridge::ParameterInfo &par, const int i ) const;
 		/**
 		 * \brief Tunes parameter names to be valid C++ variable names
 		 * \details In case the given parameter name is empty, it is rendered as 
@@ -200,7 +219,17 @@ class CppGenerator
 		 * \returns sanitized parameter name
 		 * \see sanitize_docu
 		 */
-		string sanitize_parameter_name( const string &param ) const;
+		inline string sanitize_parameter_name( const string &param ) const;
+		/**
+		 * \brief Detects empty tooltips and help and fills it with dummy content
+		 * \details For an empty tooltip (e.g. a brief docu) the string "no brief documentation"
+		 *   is used; for an empty help (e.g. a detailed docu) the string "no documentation"
+		 *   is used
+		 * \param[in] docstring either a tooltip or help text
+		 * \param[in] is_brief  indicator whether the \c docstring is a tooltip
+		 * \returns sanitized docstring
+		 */
+		inline string sanitize_docstring( const string &docstring, bool is_brief=false );
 		/**
 		 * \brief Tunes parameter name to be rendered in docu
 		 * \details In case the given parameter is empty, it is rendered as 
@@ -209,7 +238,7 @@ class CppGenerator
 		 * \param param_docu parameter to be preprocessed for docstring.
 		 * \returns preprocessed parameter name
 		 */
-		string sanitize_docu( const string &param_docu ) const;
+		inline string sanitize_docu( const string &param_docu ) const;
 		/**
 		 * \brief Tokenizes given group name into its separate parts
 		 * \details Splits the given group name at the characters '_' and '/'.
@@ -222,10 +251,10 @@ class CppGenerator
 		 * \details Creates a namespace for each element of the group vector while
 		 *   empty group names are ignored and the group name \em ug4 is replaced
 		 *   by \em ug4bridge .
-		 * \param group_hierarchy vector of groups as returned by split_group_hieararchy(group)
+		 * \param[in] group_hierarchy vector of groups as returned by split_group_hieararchy(group)
 		 * \returns string with the closing namespace brackets
 		 */
-		string write_group_namespaces( vector<string> group_hierarchy );
+		string write_group_namespaces( vector<string> group_hierarchy, bool is_global_func=false );
 		/// \}
 		
 	private:
@@ -233,6 +262,8 @@ class CppGenerator
 		
 		/// \brief Reference to the registry (to save countless calls to ug::bridge::GetUGRegistry())
 		bridge::Registry &mr_reg;
+		/// \brief Reference to a helper for retrieving the class group of a class
+		ClassHierarchyProvider &mr_chp;
 		
 		/// \brief Pointer to the currently processed class (if applicable)
 		bridge::IExportedClass *m_curr_class;
@@ -240,6 +271,8 @@ class CppGenerator
 		bridge::ClassGroupDesc *m_curr_group;
 		/// \brief Name of current group as in \ug4 itself (including namespaces)
 		string m_curr_group_name;
+		/// \brief Whether the currently processed class or function is registered by a plugin
+		bool m_is_plugin;
 		
 		/// \brief Map for keeping track of already processed classes
 		/// \details Key is the class name, which maps to the file name this class

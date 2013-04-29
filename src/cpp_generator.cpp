@@ -39,17 +39,21 @@ namespace Doxygen {
 	static const string CLASS = "/// \\class ";
 	static const string BRIEF = "/// \\brief ";
 	static const string DETAILS = "/// \\details ";
+	static const string NOTE = "/// \\note ";
+	static const string WARNING = "/// \\warning ";
 	static const string SEE = "/// \\see ";
 	static const string PARAM_IN = "/// \\param[in] ";
 	static const string RETURNS = "/// \\returns ";
 }
 
-CppGenerator::CppGenerator( const string dir, bool silent ) :
+CppGenerator::CppGenerator( const string dir, ClassHierarchyProvider &chp, bool silent ) :
 	  m_output_dir( dir )
 	, mr_reg( bridge::GetUGRegistry() )
+	, mr_chp( chp )
 	, m_curr_class( NULL )
 	, m_curr_group( NULL )
 	, m_curr_group_name( "" )
+	, m_is_plugin( false )
 	, m_written_classes()
 	, m_silent( silent )
 {}
@@ -61,11 +65,6 @@ CppGenerator::~CppGenerator()
 
 void CppGenerator::generate_cpp_files()
 {
-	m_curr_file.open( string( m_output_dir ).append( "regdocu.doxygen" ).c_str(), ios::out );
-	m_curr_file << Doxygen::ADDTOGROUP << "regdocu UGRegistry Documentation" << endl
-	            << Doxygen::BRIEF << "This module holds documentation for all registered functions and classes of libug4." << endl;
-	m_curr_file.close();
-	
 	UG_LOG( "Generating CPP files for " << mr_reg.num_class_groups() << " class groups ..." << endl );
 	for ( size_t i_class_group = 0; i_class_group < mr_reg.num_class_groups(); ++i_class_group ) {
 		m_curr_group = mr_reg.get_class_group( i_class_group );
@@ -76,32 +75,34 @@ void CppGenerator::generate_cpp_files()
 	size_t count_new_classes = 0;
 	for ( size_t i_class = 0; i_class < mr_reg.num_classes(); ++i_class ) {
 		m_curr_class = mr_reg.get_class( mr_reg.get_class( i_class ).name() );
-		if ( m_written_classes.count( m_curr_class->name() ) == 0 ) {
-			string class_id = name_to_id( m_curr_class->name() );
+		string trimmed_class_name = mr_chp.get_group( m_curr_class->name() );
+		if ( m_written_classes.count( trimmed_class_name ) == 0 ) {
+			string class_id = name_to_id( trimmed_class_name );
 			string file_name = string( m_output_dir ).append( class_id ).append( ".cpp" );
 			m_curr_file.open( file_name.c_str(), ios::out );
 			
-			m_curr_group_name = string( "ug::" ).append( m_curr_class->name() );
+			m_curr_group_name = string( "ug::" ).append( trimmed_class_name );
 			if ( !m_silent ) {
-				UG_LOG( "  Writing class " << m_curr_class->name() << " to '" 
+				UG_LOG( "  Writing class " << trimmed_class_name << " to '" 
 				        << file_name << "'." << endl );
 			}
-			m_curr_file << "namespace ug4bridge {" << endl
-			// add this class group into the global regdocu group
-			            << Doxygen::ADDTOGROUP << "regdocu" << endl
-			            << Doxygen::GROUP_OPEN << endl;
+
+			// setup namespace hierarchy
+			string namespace_group_closing = write_group_namespaces( split_group_hieararchy( m_curr_class->group() ) );
+
 			generate_class_docu();
 			generate_class_cpp();
-			m_curr_file << Doxygen::GROUP_CLOSE << endl
-			            << "}" << endl;
-			m_written_classes.insert( make_pair( m_curr_class->name(), file_name ) );
+			
+			m_curr_file << namespace_group_closing;
+			
+			m_written_classes.insert( make_pair( trimmed_class_name, file_name ) );
 			m_curr_group_name = "";
 			m_curr_file.close();
 			++count_new_classes;
 		} else {
 			if ( !m_silent ) {
-				UG_LOG( "  Class '" << m_curr_class->name() << "' already written to '" 
-				        << m_written_classes.at( m_curr_class->name() ) << "'." << endl );
+				UG_LOG( "  Class '" << trimmed_class_name << "' already written to '" 
+				        << m_written_classes.at( trimmed_class_name ) << "'." << endl );
 			}
 		}
 	}
@@ -109,6 +110,9 @@ void CppGenerator::generate_cpp_files()
 	
 	UG_LOG( "Generating CPP for " << mr_reg.num_functions() << " global functions ..." << endl );
 	generate_global_functions();
+	
+	UG_LOG( "Writing Doxygen group definitions ..." << endl );
+	write_group_definitions();
 }
 
 void CppGenerator::generate_class_group()
@@ -127,47 +131,28 @@ void CppGenerator::generate_class_group()
 	}
 	m_curr_file.open( file_name.c_str(), ios::out );
 	
-	// let's take the default class
+	// we only consider the default class
 	m_curr_class = m_curr_group->get_default_class();
 	
-	// setup namespace hierarchy
-	string namespace_closing = "";
-	if ( m_curr_class->class_names()->size() > 1 ) {
-		namespace_closing = write_group_namespaces( split_group_hieararchy( name_to_id( m_curr_class->group() ) ) );
-	}
+	// setup namespace and groups hierarchy
+	string namespace_group_closing = write_group_namespaces( split_group_hieararchy( m_curr_class->group() ) );
 	
-	
-	// BEGIN class group definition
-	m_curr_file << Doxygen::DEFGROUP << group_id << " " << m_curr_group->name() << endl;
-	// in case this group contains several specializations, display the default
+	// write class to file
+	generate_class_docu();
 	if ( m_curr_group->get_default_class() != NULL ) {
-		m_curr_file << Doxygen::BRIEF << "default specialization is " << m_curr_group->get_default_class()->name() << endl;
+		m_curr_file << Doxygen::NOTE << "default specialization is " << m_curr_group->get_default_class()->name() << endl;
 	}
-	// name and display the registered ug4 class
 	m_curr_file << Doxygen::SEE << m_curr_group_name << endl;
-	// add this class group into the global regdocu group
-	m_curr_file << Doxygen::INGROUP << "regdocu" << endl
-	            << Doxygen::GROUP_OPEN;
-	// END class group definition
+	generate_class_cpp();
+	m_written_classes.insert( make_pair( mr_chp.get_group( m_curr_class->name() ), file_name ) );
 	
-	// BEGIN classes of this group
-	for( size_t class_num = 0; class_num < m_curr_group->num_classes(); ++class_num ) {
-		m_curr_class = m_curr_group->get_class( class_num );
-		generate_class_docu();
-		generate_class_cpp();
-		m_written_classes.insert( make_pair( m_curr_class->name(), file_name ) );
-	}
-	// END classes of this group
-	
-	// close class group definition
-	m_curr_file << Doxygen::GROUP_CLOSE << endl;
-	
-	// Close namespaces
-	m_curr_file << namespace_closing;
+	// Close namespaces and groups
+	m_curr_file << namespace_group_closing;
 	
 	// resetting current group
 	m_curr_group = NULL;
 	m_curr_group_name = "";
+	m_is_plugin = false;
 	
 	m_curr_file.close();
 }
@@ -178,27 +163,35 @@ void CppGenerator::generate_global_functions()
 	UG_LOG( "Writing global functions to " << file_name << endl );
 	m_curr_file.open( file_name.c_str(), ios::out );
 	
-	// add this class group into the global regdocu group
-	m_curr_file << Doxygen::ADDTOGROUP << "regdocu" << endl
-	            << Doxygen::GROUP_OPEN << endl;
-	
-	string namespace_closing = "";
+	string namespace_group_closing;
 	for ( size_t i_global_function = 0; i_global_function < mr_reg.num_functions(); ++i_global_function ) {
 		bridge::ExportedFunction curr_func = mr_reg.get_function( i_global_function );
 		
-		// setup namespace hierarchy
-		namespace_closing = "";
-		if ( m_curr_class->class_names()->size() > 1 ) {
-			namespace_closing = write_group_namespaces( split_group_hieararchy( name_to_id( curr_func.group() ) ) );
-		}
+		// setup namespace and groups hierarchy
+		namespace_group_closing = write_group_namespaces( split_group_hieararchy( curr_func.group() ), true );
 		
 		write_generic_function( curr_func );
 		
-		m_curr_file << namespace_closing << endl;
+		// close namespaces and groups
+		m_curr_file << namespace_group_closing << endl;
+		
+		m_is_plugin = false;
 	}
 	
-	// end global group regdocu
-	m_curr_file << Doxygen::GROUP_CLOSE << endl;
+	m_curr_file.close();
+}
+
+void CppGenerator::write_group_definitions()
+{
+	m_curr_file.open( string( m_output_dir ).append( "regdocu.doxygen" ).c_str(), ios::out );
+	
+	m_curr_file << Doxygen::BRIEF << "This namespace holds documentation for all registered functions and classes of libug4." << endl
+	            << "namespace ug4Bridge {" << endl
+	            << Doxygen::BRIEF << "This namespace holds documentation for all registered plugins of libug4." << endl
+	            << Doxygen::WARNING << "The members of this namespace require certain compile-time parameters!" << endl
+	            << "namespace Plugins {" << endl
+	            << "}" << endl << "}" << endl
+	            << endl;
 	
 	m_curr_file.close();
 }
@@ -206,10 +199,14 @@ void CppGenerator::generate_global_functions()
 void CppGenerator::generate_class_docu()
 {
 	if ( m_curr_file.is_open() ) {
-		m_curr_file << endl << Doxygen::CLASS << m_curr_class->name() << endl;
+		m_curr_file << endl << Doxygen::CLASS << mr_chp.get_group( m_curr_class->name() ) << endl;
 		// tooltip
 		if ( m_curr_class->tooltip().size() > 0 ) {
 			m_curr_file << Doxygen::BRIEF << m_curr_class->tooltip() << endl;
+		}
+		if ( m_is_plugin ) {
+			m_curr_file << Doxygen::WARNING << "This class is part of a plugin. "
+			            << "Special compile-time parameters are required for this." << endl;
 		}
 	} else {
 		UG_WARNING( "File not open." );
@@ -219,9 +216,9 @@ void CppGenerator::generate_class_docu()
 void CppGenerator::generate_class_cpp()
 {
 	if ( m_curr_file.is_open() ) {
-		m_curr_file << "class " << m_curr_class->name();
+		m_curr_file << "class " << mr_chp.get_group( m_curr_class->name() );
 		if ( m_curr_class->class_name_node().num_base_classes() > 0 ) {
-			m_curr_file << " : public " << m_curr_class->class_name_node().base_class(0).name();
+			m_curr_file << " : public " << mr_chp.get_group( m_curr_class->class_name_node().base_class(0).name() );
 		}
 		m_curr_file << " {" << endl;
 		generate_class_constructors();
@@ -246,7 +243,7 @@ void CppGenerator::generate_class_constructors()
 			// input parameter docu
 			write_parameter_docu( ctor );
 			
-			m_curr_file << m_curr_class->name();
+			m_curr_file << mr_chp.get_group( m_curr_class->name() );
 			
 			string param_list = generate_parameter_list( ctor );
 			m_curr_file << param_list << ";" << endl;
@@ -254,7 +251,7 @@ void CppGenerator::generate_class_constructors()
 	} else {
 		m_curr_file << endl << "private:" << endl
 		            << Doxygen::BRIEF << "Constructor hidden / deactivated" << endl
-		            << m_curr_class->name() << "()=delete;" << endl;
+		            << mr_chp.get_group( m_curr_class->name() ) << "()=delete;" << endl;
 	}
 }
 
@@ -279,14 +276,14 @@ void CppGenerator::generate_class_public_methods()
 
 void CppGenerator::generate_class_public_members()
 {
-	m_curr_file << endl << "public:" << endl;
 	//TODO implement handling of public member variables of registered classes (if applicable)
+// 	m_curr_file << endl << "public:" << endl;
 }
 
 template< class TEntity >
 void CppGenerator::write_brief_detail_docu( const TEntity &class_function ) {
-	m_curr_file << Doxygen::BRIEF << class_function.tooltip() << endl
-	            << Doxygen::DETAILS << class_function.help() << endl;
+	m_curr_file << Doxygen::BRIEF << sanitize_docstring( class_function.tooltip(), true ) << endl
+	            << Doxygen::DETAILS << sanitize_docstring( class_function.help() ) << endl;
 }
 
 template< class TFunction >
@@ -303,6 +300,11 @@ void CppGenerator::write_generic_function( const TFunction &function, bool const
 {
 	// method docu
 	write_brief_detail_docu( function );
+	
+	if ( m_is_plugin ) {
+		m_curr_file << Doxygen::WARNING << "This function is part of a plugin. "
+		            << "Special compile-time parameters are required for this." << endl;
+	}
 	
 	// display and link registered function
 	string registered_function_name = "";
@@ -334,10 +336,10 @@ string CppGenerator::generate_parameter_list( const TFunction &func )
 	if ( func.num_parameter() > 0 ) {
 		size_t i_last_param = func.num_parameter() - 1;
 		for( size_t i_param = 0; i_param < i_last_param; ++i_param ) {
-			param_list << bridge::ParameterToString( func.params_in(), i_param )
+			param_list << parameter_to_string( func.params_in(), i_param )
 			           << " " << sanitize_parameter_name( func.parameter_name( i_param ) ) << ", ";
 		}
-		param_list << bridge::ParameterToString( func.params_in(), i_last_param )
+		param_list << parameter_to_string( func.params_in(), i_last_param )
 		           << " " << sanitize_parameter_name( func.parameter_name( i_last_param ) );
 	}
 	param_list << ")";
@@ -350,7 +352,7 @@ string CppGenerator::generate_return_value( const bridge::ExportedFunctionBase &
 	if ( param_out.size() == 1 ) {
 		// exactly one return value
 		m_curr_file << Doxygen::RETURNS << sanitize_docu( method.return_info(0) ) << endl;
-		return bridge::ParameterToString( param_out, 0 );
+		return parameter_to_string( param_out, 0 );
 	} else if ( param_out.size() > 1 ) {
 		// more than one return value
 		//TODO implement handling of multiple return values
@@ -369,8 +371,59 @@ string CppGenerator::name_to_id( const string &str )
 	boost::trim( id );
 	boost::replace_all( id, " ", "");
 	boost::replace_all( id, "/", "_");
-	boost::to_lower( id );
 	return id;
+}
+
+string CppGenerator::parameter_to_string( const bridge::ParameterInfo &par, const int i ) const
+{
+	string res = string( "" );
+	bool is_vector = par.is_vector(i);
+	
+	if ( is_vector ) res.append( "std::vector< " );
+	
+	switch( par.type(i) ) {
+		default:
+			// Fall through to invalid
+		case Variant::VT_INVALID:
+			res.append( "unknown" );
+			break;
+		case Variant::VT_BOOL:
+			res.append( "bool" );
+			break;
+		case Variant::VT_SIZE_T:
+			res.append( "size_t" );
+			break;
+		case Variant::VT_INT:
+			res.append( "int" );
+			break;
+		case Variant::VT_FLOAT:
+			res.append( "float" );
+			break;
+		case Variant::VT_DOUBLE:
+			res.append( "double" );
+			break;
+		case Variant::VT_CSTRING:
+			res.append( "const char*" );
+			break;
+		case Variant::VT_STDSTRING:
+			res.append( "std::string" );
+			break;
+		case Variant::VT_POINTER:
+			res.append( mr_chp.get_group( par.class_name(i) ) ).append( "*" );
+			break;
+		case Variant::VT_CONST_POINTER:
+			res.append( "const " ).append( mr_chp.get_group( par.class_name(i) ) ).append( "*" );
+			break;
+		case Variant::VT_SMART_POINTER:
+			res.append( "SmartPtr<" ).append( mr_chp.get_group( par.class_name(i) ) ).append( ">" );
+			break;
+		case Variant::VT_CONST_SMART_POINTER:
+			res.append( "ConstSmartPtr<" ).append( mr_chp.get_group( par.class_name(i) ) ).append( ">" );
+			break;
+	}
+	if ( is_vector ) res.append( " >" );
+	
+	return res;
 }
 
 string CppGenerator::sanitize_parameter_name( const string &param ) const
@@ -381,6 +434,17 @@ string CppGenerator::sanitize_parameter_name( const string &param ) const
 	return sanitized;
 }
 
+string CppGenerator::sanitize_docstring( const string &docstring, bool is_brief )
+{
+	string sanitized = "";
+	if ( docstring.empty() ) {
+		sanitized = ( is_brief ) ? "no brief documentation" : "no documentation";
+	} else {
+		sanitized = docstring;
+	}
+	return sanitized;
+}
+
 string CppGenerator::sanitize_docu( const string &param_docu ) const
 {
 	return ( param_docu.empty() ) ? "undocumented" : param_docu;
@@ -388,31 +452,41 @@ string CppGenerator::sanitize_docu( const string &param_docu ) const
 
 vector< string > CppGenerator::split_group_hieararchy( const string group )
 {
+	string cleanuped_group = name_to_id( group );
+	if ( cleanuped_group.empty() ) {
+		cleanuped_group = "ug4";
+	}
 	vector<string> namespaces;
-	boost::split( namespaces, group, boost::is_any_of("_/"), boost::algorithm::token_compress_on );
-	vector<string>::iterator plugin = find( namespaces.begin(), namespaces.end(), "(plugin)ug4" );
-	if ( plugin != namespaces.end() ) {
-		(*plugin) = "plugins";
-		namespaces.insert( namespaces.begin(), "ug4bridge" );
+	boost::split( namespaces, cleanuped_group, boost::is_any_of("_/"), boost::algorithm::token_compress_on );
+	vector<string>::iterator ug4 = find( namespaces.begin(), namespaces.end(), "ug4" );
+	if ( ug4 != namespaces.end() ) {
+		*ug4 = "ug4Bridge";
+	}
+	for ( vector<string>::iterator plugin = namespaces.begin(); plugin != namespaces.end(); ++plugin ) {
+		if ( (*plugin).find( "(Plugin)" ) != string::npos ) {
+			(*plugin) = "Plugins";
+			namespaces.insert( namespaces.begin(), "ug4Bridge" );
+			m_is_plugin = true;
+			break;
+		}
 	}
 	return namespaces;
 }
 
-string CppGenerator::write_group_namespaces( vector<string> group_hierarchy )
+string CppGenerator::write_group_namespaces( vector<string> group_hierarchy, bool is_global_func )
 {
-	size_t count_namespaces = 0;
-	for ( vector<string>::iterator iter = group_hierarchy.begin();
-		iter != group_hierarchy.end(); ++iter ) {
-		if ( ! (*iter).empty() ) {
-			if ( (*iter).compare( "ug4" ) == 0 ) (*iter) = "ug4bridge";
-			m_curr_file << "namespace " << *iter << " {" << endl;
-			++count_namespaces;
-		}
-	}
-	
 	stringstream closing;
-	for ( size_t i_namespace = 0; i_namespace < count_namespaces; ++i_namespace ) {
-		closing << "}" << endl;
+	
+	for ( vector<string>::iterator iter = group_hierarchy.begin();
+	      iter != group_hierarchy.end(); ++iter ) {
+		if ( ! (*iter).empty() ) {
+			if ( (*iter).compare( "ug4" ) == 0 ) {
+				m_curr_file << "namespace ug4Bridge {" << endl;
+			} else {
+				m_curr_file << "namespace " << *iter << " {" << endl;
+			}
+			closing << "}" << endl;
+		}
 	}
 	
 	return closing.str();

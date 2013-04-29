@@ -32,6 +32,7 @@
 #endif
 
 #include "ugdocu_misc.h"
+#include "class_hierarchy_provider.h"
 #include "html_generation.h"
 #include "cpp_generator.h"
 
@@ -209,8 +210,10 @@ int main(int argc, char* argv[])
 	}
 	
 	if ( generate_cpp ) {
+		regDocu::ClassHierarchyProvider chp;
+		chp.init( reg );
 		// Write C++ files
-		regDocu::CppGenerator cppgen( dir, silent );
+		regDocu::CppGenerator cppgen( dir, chp, silent );
 		cppgen.generate_cpp_files();
 	}
 
