@@ -150,77 +150,93 @@ int main(int argc, char* argv[])
 	regDocu::MyUGInit(&argc, &argv);
 	if(FindParam("-silent", argc, argv))
 		GetLogAssistant().enable_terminal_output(false);
+	try
+	{
 
-	ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
+		ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
+	
+		LOG("****************************************************************\n");
+		LOG("* ugdocu - v0.2.0\n");
+		LOG("* arguments:\n");
+		LOG("*   -d       output directory for the html/c++ files\n");
+		LOG("*   -html    generate legacy HTML bridge docu\n");
+		LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
+		LOG("*   -list    generate completion list\n");
+		LOG("*   -silent  don't print verbose progress info\n");
+		LOG("****************************************************************\n");
+	
 
-	LOG("****************************************************************\n");
-	LOG("* ugdocu - v0.2.0\n");
-	LOG("* arguments:\n");
-	LOG("*   -d       output directory for the html/c++ files\n");
-	LOG("*   -html    generate legacy HTML bridge docu\n");
-	LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
-	LOG("*   -list    generate completion list\n");
-	LOG("*   -silent  don't print verbose progress info\n");
-	LOG("****************************************************************\n");
+		string dir=".";
 
-	const char* baseDir = NULL;
-	if ( ! ParamToString( &baseDir, "-d", argc, argv ) ) {
-		UG_THROW( "No output directory given. Mandatory. Abborting!" );
-	}
-	string s_dir = baseDir;
-	if ( baseDir[strlen(baseDir)-1] != '/' ) {
-		s_dir.append( "/" );
-	}
-	const char *dir = s_dir.c_str();
-	
-	bool generate_html = FindParam( "-html", argc, argv );
-	bool generate_cpp = FindParam( "-cpp", argc, argv );
-	bool generate_list = FindParam( "-list", argc, argv );
-	
-	bool silent = FindParam( "-silent", argc, argv );
-	
-	if ( generate_html || generate_list ) {
-		regDocu::GetGroups(regDocu::classes, regDocu::classesAndGroups, regDocu::classesAndGroupsAndImplementations);
-	}
-	
-	Registry &reg = GetUGRegistry();
-	ClassHierarchy hierarchy;
-	
-	// 	init registry with cpualgebra and dim == 2
-#if defined UG_CPU_1
-	AlgebraType algebra("CPU", 1);
-#elif defined UG_CRS_1
-	AlgebraType algebra("CRS", 1);
-#else
-# error "No suitable Algebra found."
-#endif
-	const int dim = 2;
-	InitUG(dim, algebra);
+		bool generate_html = FindParam( "-html", argc, argv );
+		bool generate_cpp = FindParam( "-cpp", argc, argv );
+		bool generate_list = FindParam( "-list", argc, argv );
 
-	if ( generate_html || generate_list ) {
-		GetClassHierarchy( hierarchy, reg );
-		UG_LOG("GetClassHierarchy... ");
-		UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
-	}
+		if ((generate_html || generate_cpp))
+		{
+			const char* baseDir = NULL;
+			if(! ParamToString( &baseDir, "-d", argc, argv ) )
+			{	UG_THROW( "No output directory given. Mandatory. Abborting!" ); }
+			dir = baseDir;
+			if ( baseDir[strlen(baseDir)-1] != '/' ) {
+				dir.append( "/" );
+			}
+		}
 	
-	if ( generate_html ) {
-		// Write HTML docu
-		LOG("Writing html files to \"" << dir << "\"" << endl);
-		regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir, hierarchy);
-	}
-	
-	if ( generate_cpp ) {
-		regDocu::ClassHierarchyProvider chp;
-		chp.init( reg );
-		// Write C++ files
-		regDocu::CppGenerator cppgen( dir, chp, silent );
-		cppgen.generate_cpp_files();
-	}
+		bool silent = FindParam( "-silent", argc, argv );
 
-	if ( generate_list ) {
-		regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
-	}
+		if ( generate_html || generate_list ) {
+			regDocu::GetGroups(regDocu::classes, regDocu::classesAndGroups, regDocu::classesAndGroupsAndImplementations);
+		}
+
+		Registry &reg = GetUGRegistry();
+		ClassHierarchy hierarchy;
+
+		// 	init registry with cpualgebra and dim == 2
+	#if defined UG_CPU_1
+		AlgebraType algebra("CPU", 1);
+	#elif defined UG_CRS_1
+		AlgebraType algebra("CRS", 1);
+	#else
+	# error "No suitable Algebra found."
+	#endif
+		const int dim = 2;
+		InitUG(dim, algebra);
 	
+		if ( generate_html || generate_list ) {
+			GetClassHierarchy( hierarchy, reg );
+			UG_LOG("GetClassHierarchy... ");
+			UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
+		}
+
+		if ( generate_html ) {
+			// Write HTML docu
+			LOG("Writing html files to \"" << dir << "\"" << endl);
+			regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir.c_str(), hierarchy);
+		}
+
+		if ( generate_cpp ) {
+			regDocu::ClassHierarchyProvider chp;
+			chp.init( reg );
+			// Write C++ files
+			regDocu::CppGenerator cppgen( dir, chp, silent );
+			cppgen.generate_cpp_files();
+		}
+	
+		if ( generate_list ) {
+			regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
+		}
+	
+	}
+	catch(UGError &err)
+	{
+		PathProvider::clear_current_path_stack();
+		UG_LOG("UGError:\n");
+		for(size_t i=0; i<err.num_msg(); i++)
+			UG_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i));
+		UG_LOG("\n");
+	}
 	UGFinalize();
+	
 	return 0;
 }
