@@ -273,6 +273,8 @@ class CppGenerator
 		string m_curr_group_name;
 		/// \brief Whether the currently processed class or function is registered by a plugin
 		bool m_is_plugin;
+		/// \brief Whether the currently processed function is global
+		bool m_is_global;
 		
 		/// \brief Map for keeping track of already processed classes
 		/// \details Key is the class name, which maps to the file name this class

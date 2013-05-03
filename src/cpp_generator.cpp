@@ -54,6 +54,7 @@ CppGenerator::CppGenerator( const string dir, ClassHierarchyProvider &chp, bool 
 	, m_curr_group( NULL )
 	, m_curr_group_name( "" )
 	, m_is_plugin( false )
+	, m_is_global( false )
 	, m_written_classes()
 	, m_silent( silent )
 {}
@@ -163,6 +164,8 @@ void CppGenerator::generate_global_functions()
 	UG_LOG( "Writing global functions to " << file_name << endl );
 	m_curr_file.open( file_name.c_str(), ios::out );
 	
+	m_is_global = true;
+	
 	string namespace_group_closing;
 	for ( size_t i_global_function = 0; i_global_function < mr_reg.num_functions(); ++i_global_function ) {
 		bridge::ExportedFunction curr_func = mr_reg.get_function( i_global_function );
@@ -177,6 +180,8 @@ void CppGenerator::generate_global_functions()
 		
 		m_is_plugin = false;
 	}
+	
+	m_is_global = false;
 	
 	m_curr_file.close();
 }
@@ -201,7 +206,7 @@ void CppGenerator::generate_class_docu()
 	if ( m_curr_file.is_open() ) {
 		m_curr_file << endl << Doxygen::CLASS << mr_chp.get_group( m_curr_class->name() ) << endl;
 		// tooltip
-		if ( m_curr_class->tooltip().size() > 0 ) {
+		if ( ! m_curr_class->tooltip().empty() ) {
 			m_curr_file << Doxygen::BRIEF << m_curr_class->tooltip() << endl;
 		}
 		if ( m_is_plugin ) {
@@ -282,8 +287,12 @@ void CppGenerator::generate_class_public_members()
 
 template< class TEntity >
 void CppGenerator::write_brief_detail_docu( const TEntity &class_function ) {
-	m_curr_file << Doxygen::BRIEF << sanitize_docstring( class_function.tooltip(), true ) << endl
-	            << Doxygen::DETAILS << sanitize_docstring( class_function.help() ) << endl;
+	if ( ! sanitize_docstring( class_function.tooltip(), true ).empty() ) {
+		m_curr_file << Doxygen::BRIEF << sanitize_docstring( class_function.tooltip(), true ) << endl;
+	}
+	if ( ! sanitize_docstring( class_function.help() ).empty() ) {
+		m_curr_file << Doxygen::DETAILS << sanitize_docstring( class_function.help() ) << endl;
+	}
 }
 
 template< class TFunction >
@@ -301,7 +310,7 @@ void CppGenerator::write_generic_function( const TFunction &function, bool const
 	// method docu
 	write_brief_detail_docu( function );
 	
-	if ( m_is_plugin ) {
+	if ( m_is_global && m_is_plugin ) {
 		m_curr_file << Doxygen::WARNING << "This function is part of a plugin. "
 		            << "Special compile-time parameters are required for this." << endl;
 	}
@@ -351,7 +360,9 @@ string CppGenerator::generate_return_value( const bridge::ExportedFunctionBase &
 	const bridge::ParameterInfo param_out = method.params_out();
 	if ( param_out.size() == 1 ) {
 		// exactly one return value
-		m_curr_file << Doxygen::RETURNS << sanitize_docu( method.return_info(0) ) << endl;
+		if ( !sanitize_docu( method.return_info(0) ).empty() ) {
+			m_curr_file << Doxygen::RETURNS << sanitize_docu( method.return_info(0) ) << endl;
+		}
 		return parameter_to_string( param_out, 0 );
 	} else if ( param_out.size() > 1 ) {
 		// more than one return value
@@ -438,7 +449,8 @@ string CppGenerator::sanitize_docstring( const string &docstring, bool is_brief 
 {
 	string sanitized = "";
 	if ( docstring.empty() ) {
-		sanitized = ( is_brief ) ? "no brief documentation" : "no documentation";
+// 		sanitized = ( is_brief ) ? "no brief documentation" : "no documentation";
+		sanitized = "";
 	} else {
 		sanitized = docstring;
 	}
@@ -447,7 +459,8 @@ string CppGenerator::sanitize_docstring( const string &docstring, bool is_brief 
 
 string CppGenerator::sanitize_docu( const string &param_docu ) const
 {
-	return ( param_docu.empty() ) ? "undocumented" : param_docu;
+// 	return ( param_docu.empty() ) ? "undocumented" : param_docu;
+	return ( param_docu.empty() ) ? "" : param_docu;
 }
 
 vector< string > CppGenerator::split_group_hieararchy( const string group )
