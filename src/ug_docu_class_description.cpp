@@ -49,7 +49,7 @@ UGDocuClassDescription *GetUGDocuClassDescription(std::vector<UGDocuClassDescrip
 
 void GetGroups(std::map<string, UGRegistryGroup> &g)
 {
-	for(int i=0; i<classesAndGroups.size(); i++)
+	for(size_t i=0; i<classesAndGroups.size(); i++)
 	{
 		string group = classesAndGroups[i].group_str();
 		g[group].classesAndGroups.push_back(classesAndGroups[i]);
