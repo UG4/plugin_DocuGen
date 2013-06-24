@@ -101,24 +101,104 @@ void WriteFunctionCompleter(ostream &f, const char *desc, const bridge::Exported
 	WriteFunctionHTMLCompleter(f, thefunc, group.c_str(), pClass);
 	f << "\n";
 }
+
+void AddLuaDebugCompletions(ostream &f)
+{
+	const vector<string> &s = DebugIDManager::instance().get_registered_debug_IDs_arr();
+	std::set<string> ids;
+
+	f << "function\n"
+		<< "debugID.set_all_levels\n"
+		<< "none\n"
+		<< "debugID.set_all_levels(level)\n"
+		<< "Sets the debug level of all DebugIDs\n";
+	for(size_t i=0; i<s.size(); i++)
+	{
+		string name = s[i];
+		string rest = name;
+		string pre = "";
+
+		while(1)
+		{
+			int dotPos = rest.find(".");
+			if(dotPos == -1) break;
+			string sub = rest.substr(0, dotPos);
+			rest = rest.substr(dotPos+1, rest.size());
+			string luaDbgId = pre+sub;
+			if(ids.find(luaDbgId) == ids.end())
+			{
+				ids.insert(luaDbgId);
+				/*f << "function\n"
+					<< "debugID." << luaDbgId << "\n"
+					<< "none\n"
+					<< "debugID." << luaDbgId << "(level)\n"
+					<< "Sets the debug level of all DebugIDs matching<br>\"" << pre+sub << ".*\"\n";*/
+				f << "class\n"
+						<< "debugID." << luaDbgId << "\n"
+						<< "\n"
+						<< "DebugID of group " << luaDbgId << "\n" << ";\n";
+			}
+			pre = pre+sub+".";
+
+		}
+
+		//ug::bridge::SetLuaNamespace(pre+rest+".id", pre+rest);
+		if(ids.find(name) == ids.end())
+		{
+			ids.insert(name);
+			/*f << "function\n"
+				<< "debugID." << name << ".set_level\n"
+				<< "none\n"
+				<< "debugID." << name << ".set_level(level)\n"
+				<< "Sets the debug level of the DebugID<br>\"" << name << "\"\n";*/
+			f << "class\n"
+				<< "debugID." << name << "\n"
+				<< "\n"
+				<< "DebugID " << name << "\n" << ";\n";
+		}
+	}
+	f << "function\n"
+		<< "SetDebugLevel\n"
+		<< "none\n"
+		<< "SetDebugLevel(debugID, level)\n"
+		<< "Sets the debug level of the DebugID (use debugID. ...)\n";
+}
+
 void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations, bool bSilent, ClassHierarchy &hierarchy)
 {
 // Write ug4CompletionList.txt
 	/*
+	[class]
+	[class1]
+	[class2]
+	[class3]
+	...
+	[function1]
+	[function2]
+	[function3]
+	[function4]
+	...
+
+
+
+
+	[function]:
 	function
 	name
 	returntype
 	signature
 	html
-	.
+
+
+	[class]:
 	class
 	name
-	 class hierachy
+	class hierachy
 	html
-	memberfunction name
-	returntype
-	signature
-	html
+	[memberfunction1]
+	[memberfunction2]
+	...
+	;
 
 	memberfunction
 	name
@@ -191,6 +271,11 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 	}
 	UG_LOG("Wrote " << reg.num_functions() << " global functions.\n");
 	UG_LOG("done!\n");
+
+
+
+	AddLuaDebugCompletions(f);
+
 
 	if(bSilent)
 	{
