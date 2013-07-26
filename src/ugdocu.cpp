@@ -119,7 +119,7 @@ int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 	#else
 		std::string pluginpath = ug::PathProvider::get_path(PLUGIN_PATH);
 		std::cout << "Using Plugin Path " << pluginpath <<"\n";
-		if(!ug::LoadPlugins(pluginpath.c_str(), "(Plugin) ug4/"))
+		if(!ug::LoadPlugins(pluginpath.c_str(), "(Plugin) ug4/", bridge::GetUGRegistry()))
 		{
 			success &= false;
 			UG_LOG("ERROR in UGInit: LoadPlugins failed!\n");
