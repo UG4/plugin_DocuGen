@@ -31,10 +31,10 @@ bool ExportedFunctionsGroupSort(const bridge::ExportedFunction * i,
 
 std::string tohtmlstring(const std::string &str);
 
-bool ParameterToString(std::ostream &file, const bridge::ParameterInfo &par, int i, bool bHTML);
+void ParameterToString(std::ostream &file, const bridge::ParameterInfo &par, int i, bool bHTML);
 
 template<typename T>
-static bool WriteParametersIn(std::ostream &file, const T &thefunc, bool bHTML=true)
+static void WriteParametersIn(std::ostream &file, const T &thefunc, bool bHTML=true)
 {
 	file << "(";
 	for(size_t i=0; i < (size_t)thefunc.params_in().size(); ++i)
@@ -45,10 +45,9 @@ static bool WriteParametersIn(std::ostream &file, const T &thefunc, bool bHTML=t
 			file << thefunc.parameter_name(i);
 	}
 	file << ")";
-	return true;
 }
 template<typename T>
-static bool WriteParametersOut(std::ostream &file, const T &thefunc, bool bHTML=true)
+static void WriteParametersOut(std::ostream &file, const T &thefunc, bool bHTML=true)
 {
 	if(thefunc.params_out().size() == 1)
 	{
@@ -69,7 +68,6 @@ static bool WriteParametersOut(std::ostream &file, const T &thefunc, bool bHTML=
 	{
 		file << "void ";
 	}
-	return true;
 }
 
 

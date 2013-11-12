@@ -101,73 +101,12 @@ string GetClassGroupStd(string classname)
 }
 
 
-bool ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, bool bHTML)
+void ParameterToString(ostream &file, const bridge::ParameterInfo &par, int i, bool bHTML)
 {
-	if(par.is_vector(i)){
-		if(bHTML) file << "std::vector&lt";
-		else file << "std::vector<";
-	}
-	switch(par.type(i))
-	{
-	default:
-	case Variant::VT_INVALID:
-		file << "unknown ";
-		break;
-	case Variant::VT_BOOL:
-		file << "bool ";
-		break;
-
-	case Variant::VT_INT:
-		file << "integer ";
-		break;
-
-	case Variant::VT_SIZE_T:
-		file << "size_t ";
-		break;
-
-	case Variant::VT_FLOAT:
-	case Variant::VT_DOUBLE:
-		file << "number ";
-		break;
-
-	case Variant::VT_CSTRING:
-		file << "c_string ";
-		break;
-
-	case Variant::VT_STDSTRING:
-		file << "std_string ";
-		break;
-
-	case Variant::VT_POINTER:
-		if(bHTML)	file << "<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">";
-		file << GetClassGroup(par.class_name(i));
-		if(bHTML)	file << "</a>";
-		file << " *";
-		break;
-
-	case Variant::VT_CONST_POINTER:
-		file << "const ";
-		if(bHTML)	file << "<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">";
-		file << GetClassGroup(par.class_name(i));
-		if(bHTML)	file << "</a>";
-		file << " *";
-		break;
-
-	case Variant::VT_SMART_POINTER:
-		if(bHTML)	file << "SmartPtr&lt;<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">" << GetClassGroup(par.class_name(i)) << "</a>&gt; ";
-		else		file << "SmartPtr<" << GetClassGroup(par.class_name(i)) << "> ";
-		break;
-
-	case Variant::VT_CONST_SMART_POINTER:
-		if(bHTML)	file << "const SmartPtr&lt;<a href=\"" << GetClassGroupStd(par.class_name(i)) << ".html\"" << ">" << GetClassGroup(par.class_name(i)) << "</a>&gt; ";
-		else		file << "const SmartPtr<" << GetClassGroup(par.class_name(i)) << "> ";
-		break;
-	}
-	if(par.is_vector(i)){
-		if(bHTML) file << "&gt";
-		else file << ">";
-	}
-	return true;
+	if(bHTML)
+		file << XMLStringEscape(ParameterToString(par, i)) << " ";
+	else
+		file << ParameterToString(par, i) << " ";
 }
 
 

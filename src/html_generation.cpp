@@ -111,13 +111,13 @@ string ConstructorInfoHTML(string classname, const bridge::ExportedConstructor &
 	if(thefunc.tooltip().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>";
+		file << "tooltip: " << XMLStringEscape(thefunc.tooltip()) << "<br/></td></tr>";
 	}
 
 	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "help: " << thefunc.help() << "<br/></td></tr>";
+		file << "help: " << XMLStringEscape(thefunc.help()) << "<br/></td></tr>";
 	}
 	return file.str();
 }
@@ -151,13 +151,13 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 	if(thefunc.tooltip().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>";
+		file << "tooltip: " << XMLStringEscape(thefunc.tooltip()) << "<br/></td></tr>";
 	}
 
 	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "help: " << thefunc.help() << "<br/></td></tr>";
+		file << "help: " << XMLStringEscape(thefunc.help()) << "<br/></td></tr>";
 	}
 	return file.str();
 }
@@ -188,13 +188,13 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 	if(thefunc.tooltip().size() > 0)
 	{
 		file << "<tr><td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "tooltip: " << thefunc.tooltip() << "<br/></td></tr>";
+		file << "tooltip: " << XMLStringEscape(thefunc.tooltip()) << "<br/></td></tr>";
 	}
 
 	if(thefunc.help().size() > 0 && thefunc.help().compare("No help") != 0)
 	{
 		file << "<tr><<td class=\"mdescLeft\">&#160;</td><td class=\"mdescLeft\">&#160;</td><td class=\"mdescRight\">";
-		file << "help: " << thefunc.help() << "<br/></td></tr>";
+		file << "help: " << XMLStringEscape(thefunc.help()) << "<br/></td></tr>";
 	}
 	return file.str();
 }
@@ -364,7 +364,7 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 	}
 
 	if(c.tooltip().size() != 0)
-		classhtml << "<p align=\"center\">" << c.tooltip() << "</p><br>";
+		classhtml << "<p align=\"center\">" << XMLStringEscape(c.tooltip()) << "</p><br>";
 	if(c.is_instantiable())
 		classhtml << "class has constructor<br>";
 	else
