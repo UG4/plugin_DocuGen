@@ -87,51 +87,77 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 
 int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 {
+	int errors = 0;
 	PROFILE_FUNC();
-	bool success = true;
 
-	static bool firstCall = true;
-	if (firstCall) {
-		firstCall = false;
+	pcl::Init(argcp, argvp);
+	GetLogAssistant().set_output_process(parallelOutputProcRank);
 
-#ifdef UG_PARALLEL
-		pcl::Init(argcp, argvp);
-		GetLogAssistant().set_output_process(parallelOutputProcRank);
-#endif
+//	INIT PATH
+	try{
 
-		success &= InitPaths((*argvp)[0]);
-
-#ifdef UG_BRIDGE
-		try{
-			bridge::InitBridge();
-		}
-		catch(UGError& err)
+		if(InitPaths((*argvp)[0]) == false)
 		{
-			success &= false;
-			UG_LOG("ERROR in UGInit: InitBridge failed!\n");
+			UG_ERR_LOG("Path Initialization failed. Expect file access problem.\n")
+			UG_ERR_LOG("Check environment variable UG4_ROOT.\n")
+			errors |= 1;
 		}
-#endif
-
-#ifdef UG_PLUGINS
-	#ifdef UG_EMBEDDED_PLUGINS
-		std::cout << "Using Embedded Plugins.\n");
-		InitializeEmbeddedPlugins(&bridge::GetUGRegistry(), "(Plugin) ug4/");
-	#else
-		std::string pluginpath = ug::PathProvider::get_path(PLUGIN_PATH);
-		std::cout << "Using Plugin Path " << pluginpath <<"\n";
-		if(!ug::LoadPlugins(pluginpath.c_str(), "(Plugin) ug4/", bridge::GetUGRegistry()))
-		{
-			success &= false;
-			UG_LOG("ERROR in UGInit: LoadPlugins failed!\n");
-		}
-	#endif
-#else
-	std::cout << "WARNING: UG_PLUGINS NOT DEFINED!!! Plugins will not be loaded.\n";
-#endif
+	}
+	catch(UGError& err)
+	{
+	//	if ugerror is throw, an internal fatal error occured, we termiate shell
+		UG_ERR_LOG("UGError occurred during Path Initialization:\n");
+		for(size_t i=0; i<err.num_msg(); i++)
+			UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
+		errors |= 2;
+	}
+	catch(...){
+		UG_ERR_LOG("Unknown error received during Path Initialization.\n");
+		errors |= 2;
 	}
 
-	// convert boolean success == true to int = 0.
-	return !success;
+//	INIT STANDARD BRIDGE
+	try{
+		bridge::InitBridge();
+	}
+	catch(UGError& err)
+	{
+		UG_ERR_LOG("UGError occurred during Standard Bridge Initialization:\n");
+		for(size_t i=0; i<err.num_msg(); i++)
+			UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
+		errors |= 2;
+	}
+	catch(...){
+		UG_ERR_LOG("Unknown error received during Standard Bridge Initialization.\n");
+		errors |= 2;
+	}
+
+//	INIT PLUGINS
+	try{
+		if(UGInitPlugins() == false)
+		{
+			UG_ERR_LOG("Some error at Plugin initialization.\n");
+			errors |= 1;
+		}
+
+	}
+	catch(UGError &err)
+	{
+	//	if registration of plugin fails, we do abort the shell
+	//	this could be skipped if registering of plugin would be done more
+	//	carefully. (try/catch in load plugins)
+		PathProvider::clear_current_path_stack();
+		UG_ERR_LOG("UGError occurred during Plugin Initialization:\n");
+		for(size_t i=0; i<err.num_msg(); i++)
+			UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
+		errors |= 2;
+	}
+	catch(...){
+		UG_ERR_LOG("Unknown error received during Plugin Initialization.\n");
+		errors |= 2;
+	}
+
+	return errors;
 }
 
 vector<UGDocuClassDescription> classes;
@@ -147,96 +173,116 @@ vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 /// \addtogroup apps_ugdocu
 int main(int argc, char* argv[])
 {
-	regDocu::MyUGInit(&argc, &argv);
-	if(FindParam("-silent", argc, argv))
-		GetLogAssistant().enable_terminal_output(false);
-	try
+	int errors = regDocu::MyUGInit(&argc, &argv);
+	if((errors & 2) == 0)
 	{
-
-		ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
-	
-		LOG("****************************************************************\n");
-		LOG("* ugdocu - v0.2.0\n");
-		LOG("* arguments:\n");
-		LOG("*   -d       output directory for the html/c++ files\n");
-		LOG("*   -html    generate legacy HTML bridge docu\n");
-		LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
-		LOG("*   -list    generate completion list\n");
-		LOG("*   -silent  don't print verbose progress info\n");
-		LOG("****************************************************************\n");
-	
-
-		string dir=".";
-
-		bool generate_html = FindParam( "-html", argc, argv );
-		bool generate_cpp = FindParam( "-cpp", argc, argv );
-		bool generate_list = FindParam( "-list", argc, argv );
-
-		if ((generate_html || generate_cpp))
+		if(FindParam("-silent", argc, argv))
+			GetLogAssistant().enable_terminal_output(false);
+		try
 		{
-			const char* baseDir = NULL;
-			if(! ParamToString( &baseDir, "-d", argc, argv ) )
-			{	UG_THROW( "No output directory given. Mandatory. Abborting!" ); }
-			dir = baseDir;
-			if ( baseDir[strlen(baseDir)-1] != '/' ) {
-				dir.append( "/" );
+
+			ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
+
+			LOG("****************************************************************\n");
+			LOG("* ugdocu - v0.2.0\n");
+			LOG("* arguments:\n");
+			LOG("*   -d       output directory for the html/c++ files\n");
+			LOG("*   -html    generate legacy HTML bridge docu\n");
+			LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
+			LOG("*   -list    generate completion list\n");
+			LOG("*   -silent  don't print verbose progress info\n");
+			LOG("****************************************************************\n");
+
+
+			string dir=".";
+
+			bool generate_html = FindParam( "-html", argc, argv );
+			bool generate_cpp = FindParam( "-cpp", argc, argv );
+			bool generate_list = FindParam( "-list", argc, argv );
+
+			if ((generate_html || generate_cpp))
+			{
+				const char* baseDir = NULL;
+				if(! ParamToString( &baseDir, "-d", argc, argv ) )
+				{	UG_THROW( "No output directory given. Mandatory. Abborting!" ); }
+				dir = baseDir;
+				if ( baseDir[strlen(baseDir)-1] != '/' ) {
+					dir.append( "/" );
+				}
 			}
-		}
+
+			bool silent = FindParam( "-silent", argc, argv );
+
+			if ( generate_html || generate_list ) {
+				regDocu::GetGroups(regDocu::classes, regDocu::classesAndGroups, regDocu::classesAndGroupsAndImplementations);
+			}
 	
-		bool silent = FindParam( "-silent", argc, argv );
-
-		if ( generate_html || generate_list ) {
-			regDocu::GetGroups(regDocu::classes, regDocu::classesAndGroups, regDocu::classesAndGroupsAndImplementations);
-		}
-
-		Registry &reg = GetUGRegistry();
-		ClassHierarchy hierarchy;
-
-		// 	init registry with cpualgebra and dim == 2
-	#if defined UG_CPU_1
-		AlgebraType algebra("CPU", 1);
-	#elif defined UG_CRS_1
-		AlgebraType algebra("CRS", 1);
-	#else
-	# error "No suitable Algebra found."
-	#endif
-		const int dim = 2;
-		InitUG(dim, algebra);
+			Registry &reg = GetUGRegistry();
+			ClassHierarchy hierarchy;
 	
-		if ( generate_html || generate_list ) {
-			GetClassHierarchy( hierarchy, reg );
-			UG_LOG("GetClassHierarchy... ");
-			UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
-		}
+			// 	init registry with cpualgebra and dim == 2
+		#if defined UG_CPU_1
+			AlgebraType algebra("CPU", 1);
+		#elif defined UG_CRS_1
+			AlgebraType algebra("CRS", 1);
+		#else
+		# error "No suitable Algebra found."
+		#endif
+			const int dim = 2;
+			InitUG(dim, algebra);
 
-		if ( generate_html ) {
-			// Write HTML docu
-			LOG("Writing html files to \"" << dir << "\"" << endl);
-			regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir.c_str(), hierarchy);
-		}
+			if ( generate_html || generate_list ) {
+				GetClassHierarchy( hierarchy, reg );
+				UG_LOG("GetClassHierarchy... ");
+				UG_LOG(hierarchy.subclasses.size() << " base classes, " << reg.num_class_groups() << " total. " << endl);
+			}
+	
+			if ( generate_html ) {
+				// Write HTML docu
+				LOG("Writing html files to \"" << dir << "\"" << endl);
+				regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir.c_str(), hierarchy);
+			}
+	
+			if ( generate_cpp ) {
+				regDocu::ClassHierarchyProvider chp;
+				chp.init( reg );
+				// Write C++ files
+				regDocu::CppGenerator cppgen( dir, chp, silent );
+				cppgen.generate_cpp_files();
+			}
 
-		if ( generate_cpp ) {
-			regDocu::ClassHierarchyProvider chp;
-			chp.init( reg );
-			// Write C++ files
-			regDocu::CppGenerator cppgen( dir, chp, silent );
-			cppgen.generate_cpp_files();
+			if ( generate_list ) {
+				regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
+			}
+
 		}
-	
-		if ( generate_list ) {
-			regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
+		catch(UGError &err)
+		{
+			errors &= 4;
+			PathProvider::clear_current_path_stack();
+			UG_ERR_LOG("UGError in Docu Generation:\n");
+
+			for(size_t i=0; i<err.num_msg(); i++)
+				UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
 		}
-	
 	}
-	catch(UGError &err)
+	GetLogAssistant().enable_terminal_output(true);
+	if(errors != 0)
 	{
-		PathProvider::clear_current_path_stack();
-		UG_LOG("UGError:\n");
-		for(size_t i=0; i<err.num_msg(); i++)
-			UG_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i));
-		UG_LOG("\n");
+		UG_LOG("\n[[[--- ugdocu/ugshell Initialization Errors ------\n")
+		UG_LOG("ugdocu Completition generation noticed some errors during startup of ugshell.\n");
+
+		UG_LOG("Note that these are not compilation errors, but MAY cause problems in the use of ugshell.\n");
+		if(errors >= 2)
+		{	UG_LOG("Completition could NOT be generated due to fatal ugshell init errors.\n");}
 	}
+
 	UGFinalize();
+
+	if(errors != 0)
+	{
+		UG_LOG("------ ugdocu/ugshell Initialization Errors ---]]]\n\n");
+	}
 	
 	return 0;
 }

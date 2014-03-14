@@ -99,6 +99,7 @@ void WriteFooter(fstream &file)
 string ConstructorInfoHTML(string classname, const bridge::ExportedConstructor &thefunc,
 		string group)
 {
+	try{
 	stringstream file;
 
 	// function name
@@ -120,6 +121,7 @@ string ConstructorInfoHTML(string classname, const bridge::ExportedConstructor &
 		file << "help: " << XMLStringEscape(thefunc.help()) << "<br/></td></tr>";
 	}
 	return file.str();
+	}UG_CATCH_THROW_FUNC();	return "";
 }
 
 
@@ -127,6 +129,7 @@ string ConstructorInfoHTML(string classname, const bridge::ExportedConstructor &
 string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 		const IExportedClass *c, bool bConst)
 {
+	try{
 	stringstream file;
 	file << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
 	WriteParametersOut(file, thefunc);
@@ -160,6 +163,8 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 		file << "help: " << XMLStringEscape(thefunc.help()) << "<br/></td></tr>";
 	}
 	return file.str();
+
+	}UG_CATCH_THROW_FUNC();	return "";
 }
 
 
@@ -167,6 +172,7 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 		const char *group)
 {
+	try{
 	stringstream file;
 	file << "<tr>";
 	file << "<td class=\"mdescLeft\">" << group << "</td>";
@@ -197,6 +203,8 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
 		file << "help: " << XMLStringEscape(thefunc.help()) << "<br/></td></tr>";
 	}
 	return file.str();
+
+	}UG_CATCH_THROW_FUNC();	return "";
 }
 
 
@@ -208,6 +216,7 @@ string FunctionInfoHTML(const bridge::ExportedFunctionBase &thefunc,
  */
 bool WriteClassUsageExact(const string &preamble, ostream &file, const char *classname, bool OutParameters)
 {
+	try{
 	Registry &reg = GetUGRegistry();
 	bool bPreambleWritten = false;
 	// check functions
@@ -263,10 +272,12 @@ bool WriteClassUsageExact(const string &preamble, ostream &file, const char *cla
 		}
 	}
 	return true;
+	}UG_CATCH_THROW_FUNC();	return false;
 }
 
 void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInherited)
 {
+	try{
 	if(c == NULL) return;
 
 	if(c->num_constructors())
@@ -315,22 +326,27 @@ void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInher
 			file << FunctionInfoHTML(*sortedFunctions[i]);
 		file << "<tr><td><br></td></tr>";
 	}
+	}UG_CATCH_THROW_FUNC();"";
 }
 
 // write the ugdocu.css
 //TODO: make sure dir exists and is writeable!
 void WriteUGDocuCSS(const char *dir)
 {
+	try{
 	UG_LOG("WriteUGDocuCSS... ");
 	fstream ugdocucss((string(dir).append("ugdocu.css")).c_str(), ios::out);
 	ugdocucss.write((char *)ugdocu_css, ugdocu_css_len);
 	UG_LOG(ugdocu_css_len << " characters." << endl);
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 
 // print class hierarchy in hierarchy.html
 void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 {
+	try{
 	fstream hierarchyhtml((string(dir).append("hierarchy.html")).c_str(), ios::out);
 	WriteHeader(hierarchyhtml, "Class Hierarchy");
 	hierarchyhtml << "<h1>ugbridge Class Hierarchy (ug4)</h1>This inheritance list sorted hierarchically:<ul>";
@@ -338,6 +354,8 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 		WriteClassHierarchy(hierarchyhtml, hierarchy.subclasses[i]);
 	hierarchyhtml << "</ul>";
 	WriteFooter(hierarchyhtml);
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 
@@ -345,6 +363,7 @@ void WriteClassHierarchy(const char *dir, ClassHierarchy &hierarchy)
 // write html file for a class
 void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
 {
+	try{
 	Registry &reg = GetUGRegistry();
 
 	const IExportedClass &c = *d->mp_class;
@@ -475,11 +494,13 @@ void WriteClassHTML(const char *dir, UGDocuClassDescription *d, ClassHierarchy &
 
 
 	WriteFooter(classhtml);
+	}UG_CATCH_THROW_FUNC();
 }
 
 // write alphabetical class index in index.html
 void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &classesAndGroups, bool bGroup)
 {
+	try{
 	UG_LOG("WriteClassIndex" << (bGroup?" by group " : "") << "... ");
 //	Registry &reg = GetUGRegistry();
 
@@ -535,6 +556,7 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 	indexhtml 	<< "</table>";
 	WriteFooter(indexhtml);
 	UG_LOG(classesAndGroups.size() << " class groups written. " << endl);
+	} UG_CATCH_THROW_FUNC();
 }
 
 
@@ -543,6 +565,7 @@ void GetGroups(std::map<string, UGRegistryGroup> &g);
 // write alphabetical class index in index.html
 void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAndGroups)
 {
+	try{
 	UG_LOG("WriteGroups...");
 //	Registry &reg = GetUGRegistry();
 
@@ -633,6 +656,7 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 
 	indexhtml 	<< "</ul>";
 	WriteFooter(indexhtml);
+	}UG_CATCH_THROW_FUNC();
 }
 
 
@@ -641,6 +665,7 @@ template<typename TSortFunction>
 void WriteGlobalFunctions(const char *dir, const char *filename,
 		TSortFunction sortFunction)
 {
+	try{
 	UG_LOG("WriteGlobalFunctions (" << filename << ") ... ");
 	Registry &reg = GetUGRegistry();
 
@@ -667,11 +692,13 @@ void WriteGlobalFunctions(const char *dir, const char *filename,
 	WriteFooter(funchtml);
 
 	UG_LOG(reg.num_functions() << " functions written." << endl);
+	}UG_CATCH_THROW_FUNC();
 }
 
 
 void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups, const char *dir, ClassHierarchy &hierarchy)
 {
+	try{
 	Registry &reg = GetUGRegistry();
 
 	WriteUGDocuCSS(dir);
@@ -694,6 +721,7 @@ void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGD
 	WriteGlobalFunctions(dir, "groupedfunctions.html", ExportedFunctionsGroupSort);
 
 	UG_LOG("done." << endl);
+	}UG_CATCH_THROW_FUNC();
 }
 
 }	// namespace regDocu

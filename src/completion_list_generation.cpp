@@ -58,6 +58,7 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 void WriteConstructorCompleter(ostream &f, string classname, const bridge::ExportedConstructor &thefunc,
 		string group)
 {
+	try{
 	// function name
 	f << "constructor\n" << classname << "\n";
 	// returntype
@@ -78,11 +79,14 @@ void WriteConstructorCompleter(ostream &f, string classname, const bridge::Expor
 	if(group.length() != 0)
 		f << "<br>Registry Group: <b>" << group << "</b>";
 	f << "\n";
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 void WriteFunctionCompleter(ostream &f, const char *desc, const bridge::ExportedFunctionBase &thefunc,
 		string group, const char *pClass, bool bConst)
 {
+	try{
 	// function name
 	f << desc << "\n" << thefunc.name() << "\n";
 	// returntype
@@ -100,10 +104,13 @@ void WriteFunctionCompleter(ostream &f, const char *desc, const bridge::Exported
 	// html
 	WriteFunctionHTMLCompleter(f, thefunc, group.c_str(), pClass);
 	f << "\n";
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 void AddLuaDebugCompletions(ostream &f)
 {
+	try{
 	const vector<string> &s = DebugIDManager::instance().get_registered_debug_IDs_arr();
 	std::set<string> ids;
 
@@ -162,10 +169,13 @@ void AddLuaDebugCompletions(ostream &f)
 		<< "none\n"
 		<< "SetDebugLevel(debugID, level)\n"
 		<< "Sets the debug level of the DebugID (use debugID. ...)\n";
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations, bool bSilent, ClassHierarchy &hierarchy)
 {
+	try{
 // Write ug4CompletionList.txt
 	/*
 	[class]
@@ -283,11 +293,14 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 		cout << "Wrote ug4 completion file to " << ug4CompletionFile << ", " << classesAndGroupsAndImplementations.size() << " classes/classgroups, " << reg.num_functions() << " global functions.\n";
 		GetLogAssistant().enable_terminal_output(false);
 	}
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 void WriteFunctionHTMLCompleter(ostream &file, const bridge::ExportedFunctionBase &thefunc,
 		const char *group, const char *pClass)
 {
+	try{
 	WriteParametersOut(file, thefunc);
 	file << thefunc.name() << " ";
 	WriteParametersIn(file, thefunc);
@@ -305,11 +318,14 @@ void WriteFunctionHTMLCompleter(ostream &file, const bridge::ExportedFunctionBas
 
 	if(group != NULL)
 		file << "<br>Registry Group: <b>" << group << "</b>";
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 
 void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHierarchy &hierarchy)
 {
+	try{
 	Registry &reg = GetUGRegistry();
 	const IExportedClass *pC = d->mp_class;
 	if(pC == NULL)
@@ -327,8 +343,6 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 		classhtml << "Classgroup <b>" << d->mp_group->name() << "</b><br>";
 
 	classhtml << "Registry Group: <b>" << pC->group() << "</b><br>";
-
-
 
 	if(pC->is_instantiable())
 		classhtml << "class has constructor. ";
@@ -392,6 +406,7 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 		WriteClassUsageExact(str, classhtml, name.c_str(), false);
 	}
 	classhtml << "</table>";
+	}UG_CATCH_THROW_FUNC();
 }
 
 // end group apps_ugdocu

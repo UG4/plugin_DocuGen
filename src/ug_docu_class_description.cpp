@@ -49,6 +49,7 @@ UGDocuClassDescription *GetUGDocuClassDescription(std::vector<UGDocuClassDescrip
 
 void GetGroups(std::map<string, UGRegistryGroup> &g)
 {
+	try{
 	for(size_t i=0; i<classesAndGroups.size(); i++)
 	{
 		string group = classesAndGroups[i].group_str();
@@ -74,12 +75,13 @@ void GetGroups(std::map<string, UGRegistryGroup> &g)
 		std::vector<bridge::ExportedFunction*> &v = it->second.functions;
 		sort(v.begin(), v.end(), ExportedFunctionsSort);
 	}
-
+	}UG_CATCH_THROW_FUNC();
 }
 
 void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuClassDescription> &classesAndGroups,
 		std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations )
 {
+	try{
 	Registry &reg = GetUGRegistry();
 
 	for(size_t i=0; i<reg.num_classes(); ++i)
@@ -126,6 +128,7 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		if(classesAndGroups[i].c == NULL) UG_LOG("	(group)");
 		UG_LOG("\n");
 	}*/
+	}UG_CATCH_THROW_FUNC();
 }
 
 }	// namespace regDocu

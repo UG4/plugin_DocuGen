@@ -66,6 +66,7 @@ CppGenerator::~CppGenerator()
 
 void CppGenerator::generate_cpp_files()
 {
+	try{
 	UG_LOG( "Generating CPP files for " << mr_reg.num_class_groups() << " class groups ..." << endl );
 	for ( size_t i_class_group = 0; i_class_group < mr_reg.num_class_groups(); ++i_class_group ) {
 		m_curr_group = mr_reg.get_class_group( i_class_group );
@@ -114,10 +115,12 @@ void CppGenerator::generate_cpp_files()
 	
 	UG_LOG( "Writing Doxygen group definitions ..." << endl );
 	write_group_definitions();
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_class_group()
 {
+	try{
 	m_curr_group_name = string( "ug::" ).append( m_curr_group->name() );
 	string group_id = name_to_id( m_curr_group->name() );
 	
@@ -156,10 +159,12 @@ void CppGenerator::generate_class_group()
 	m_is_plugin = false;
 	
 	m_curr_file.close();
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_global_functions()
 {
+	try{
 	string file_name = string( m_output_dir ).append( "global_functions.cpp" );
 	UG_LOG( "Writing global functions to " << file_name << endl );
 	m_curr_file.open( file_name.c_str(), ios::out );
@@ -184,10 +189,12 @@ void CppGenerator::generate_global_functions()
 	m_is_global = false;
 	
 	m_curr_file.close();
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::write_group_definitions()
 {
+	try{
 	m_curr_file.open( string( m_output_dir ).append( "regdocu.doxygen" ).c_str(), ios::out );
 	
 	m_curr_file << Doxygen::BRIEF << "This namespace holds documentation for all registered functions and classes of libug4." << endl
@@ -199,10 +206,12 @@ void CppGenerator::write_group_definitions()
 	            << endl;
 	
 	m_curr_file.close();
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_class_docu()
 {
+	try{
 	if ( m_curr_file.is_open() ) {
 		m_curr_file << endl << Doxygen::CLASS << mr_chp.get_group( m_curr_class->name() ) << endl;
 		// tooltip
@@ -216,10 +225,14 @@ void CppGenerator::generate_class_docu()
 	} else {
 		UG_WARNING( "File not open." );
 	}
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_class_cpp()
 {
+	try{
+
 	if ( m_curr_file.is_open() ) {
 		m_curr_file << "class " << mr_chp.get_group( m_curr_class->name() );
 		if ( m_curr_class->class_name_node().num_base_classes() > 0 ) {
@@ -233,10 +246,13 @@ void CppGenerator::generate_class_cpp()
 	} else {
 		UG_WARNING( "File not open." );
 	}
+
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_class_constructors()
 {
+	try{
 	if ( m_curr_class->is_instantiable() ) {
 		m_curr_file << endl << "public:" << endl;
 		for( size_t i_ctor = 0; i_ctor < m_curr_class->num_constructors(); ++i_ctor ) {
@@ -258,10 +274,12 @@ void CppGenerator::generate_class_constructors()
 		            << Doxygen::BRIEF << "Constructor hidden / deactivated" << endl
 		            << mr_chp.get_group( m_curr_class->name() ) << "()=delete;" << endl;
 	}
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_class_public_methods()
 {
+	try{
 	m_curr_file << endl << "public:" << endl;
 	size_t num_methods = m_curr_class->num_methods();
 	size_t num_const_methods = m_curr_class->num_const_methods();
@@ -277,6 +295,7 @@ void CppGenerator::generate_class_public_methods()
 		const bridge::ExportedMethod const_method = m_curr_class->get_const_method( i_const_method );
 		write_generic_function( const_method, true );
 	}
+	}UG_CATCH_THROW_FUNC();
 }
 
 void CppGenerator::generate_class_public_members()
@@ -307,6 +326,7 @@ void CppGenerator::write_parameter_docu( const TFunction &function )
 template< class TFunction >
 void CppGenerator::write_generic_function( const TFunction &function, bool constant )
 {
+	try{
 	// method docu
 	write_brief_detail_docu( function );
 	
@@ -335,11 +355,13 @@ void CppGenerator::write_generic_function( const TFunction &function, bool const
 	if ( constant ) m_curr_file << " const";
 	m_curr_file << " { " << registered_function_name
 	            << param_list << "; }" << endl;
+	}UG_CATCH_THROW_FUNC();
 }
 
 template< class TFunction >
 string CppGenerator::generate_parameter_list( const TFunction &func )
 {
+	try{
 	stringstream param_list;
 	param_list << "(";
 	if ( func.num_parameter() > 0 ) {
@@ -353,10 +375,13 @@ string CppGenerator::generate_parameter_list( const TFunction &func )
 	}
 	param_list << ")";
 	return param_list.str();
+
+	}UG_CATCH_THROW_FUNC(); return "";
 }
 
 string CppGenerator::generate_return_value( const bridge::ExportedFunctionBase &method )
 {
+	try{
 	const bridge::ParameterInfo param_out = method.params_out();
 	if ( param_out.size() == 1 ) {
 		// exactly one return value
@@ -374,6 +399,8 @@ string CppGenerator::generate_return_value( const bridge::ExportedFunctionBase &
 		// no return value (i.e. void)
 		return string("void");
 	}
+
+	}UG_CATCH_THROW_FUNC(); return "";
 }
 
 string CppGenerator::name_to_id( const string &str )
