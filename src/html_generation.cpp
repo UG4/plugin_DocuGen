@@ -546,7 +546,8 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		if(c.mp_class == NULL) // group
 		{
 			UG_LOG(__LINE__ << " i= " << i << "\n");
-			indexhtml << "<a class=\"el\" href=\"" << c.mp_group->get_default_class()->name() << ".html\">" << c.mp_group->name() << "</a>\n";
+			if(c.mp_class != NULL)
+				indexhtml << "<a class=\"el\" href=\"" << c.mp_group->get_default_class()->name() << ".html\">" << c.mp_group->name() << "</a>\n";
 			/*indexhtml << "<p> <font size=\"1\">\n";
 			indexhtml << "<ul>";
 			for(size_t j=0; j<c.group->num_classes(); j++)
