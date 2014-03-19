@@ -326,7 +326,7 @@ void PrintClassFunctionsHMTL(ostream &file, const IExportedClass *c, bool bInher
 			file << FunctionInfoHTML(*sortedFunctions[i]);
 		file << "<tr><td><br></td></tr>";
 	}
-	}UG_CATCH_THROW_FUNC();"";
+	}UG_CATCH_THROW_FUNC();
 }
 
 // write the ugdocu.css
