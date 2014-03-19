@@ -137,6 +137,7 @@ void CppGenerator::generate_class_group()
 	
 	// we only consider the default class
 	m_curr_class = m_curr_group->get_default_class();
+	if(m_curr_class  == NULL) return;
 	
 	// setup namespace and groups hierarchy
 	string namespace_group_closing = write_group_namespaces( split_group_hieararchy( m_curr_class->group() ) );
