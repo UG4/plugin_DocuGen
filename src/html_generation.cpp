@@ -506,23 +506,35 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 
 	fstream indexhtml((string(dir).append(bGroup ? "groupindex.html" : "index.html")).c_str(), ios::out);
 
+	UG_LOG(__LINE__ << "\n");
 	if(bGroup)
 	{
+		UG_LOG(__LINE__ << "\n");
 		WriteHeader(indexhtml, "Class Index by Group");
+		UG_LOG(__LINE__ << "\n");
 		indexhtml << "<h1>ug4 Class Index by Group</h1>";
+		UG_LOG(__LINE__ << "\n");
 		sort(classesAndGroups.begin(), classesAndGroups.end(), GroupNameSortFunction);
+		UG_LOG(__LINE__ << "\n");
 	}
 	else
 	{
+		UG_LOG(__LINE__ << "\n");
 		WriteHeader(indexhtml, "Class Index");
+		UG_LOG(__LINE__ << "\n");
 		indexhtml << "<h1>ug4 Class Index</h1>";
+		UG_LOG(__LINE__ << "\n");
 		sort(classesAndGroups.begin(), classesAndGroups.end(), NameSortFunction);
+		UG_LOG(__LINE__ << "\n");
 	}
 
+	UG_LOG(__LINE__ << "\n");
 	indexhtml 	<< "<table border=0 cellpadding=0 cellspacing=0>"
 					<< "<tr><td></td></tr>";
+	UG_LOG(__LINE__ << "\n");
 	for(size_t i=0; i<classesAndGroups.size(); i++)
 	{
+		UG_LOG(__LINE__ << " i= " << i << "\n");
 		indexhtml << "<tr><td class=\"memItemLeft\" nowrap align=right valign=top>";
 
 		UGDocuClassDescription &c = classesAndGroups[i];
@@ -530,8 +542,10 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		indexhtml << " ";
 		indexhtml << "</td>";
 		indexhtml << "<td class=\"memItemRight\" valign=bottom>";
+		UG_LOG(__LINE__ << " i= " << i << "\n");
 		if(c.mp_class == NULL) // group
 		{
+			UG_LOG(__LINE__ << " i= " << i << "\n");
 			indexhtml << "<a class=\"el\" href=\"" << c.mp_group->get_default_class()->name() << ".html\">" << c.mp_group->name() << "</a>\n";
 			/*indexhtml << "<p> <font size=\"1\">\n";
 			indexhtml << "<ul>";
@@ -547,14 +561,18 @@ void WriteClassIndex(const char *dir, std::vector<UGDocuClassDescription> &class
 		}
 		else
 		{
+			UG_LOG(__LINE__ << " i= " << i << "\n");
 			indexhtml << "<a class=\"el\" href=\"" << c.name() << ".html\">" << c.name() << "</a>\n";
 		}
-
+		UG_LOG(__LINE__ << " i= " << i << "\n");
 		indexhtml << "</td></tr>";
 	}
 
+	UG_LOG(__LINE__ << "\n");
 	indexhtml 	<< "</table>";
+	UG_LOG(__LINE__ << "\n");
 	WriteFooter(indexhtml);
+	UG_LOG(__LINE__ << "\n");
 	UG_LOG(classesAndGroups.size() << " class groups written. " << endl);
 	} UG_CATCH_THROW_FUNC();
 }
