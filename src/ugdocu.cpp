@@ -180,9 +180,6 @@ int main(int argc, char* argv[])
 			GetLogAssistant().enable_terminal_output(false);
 		try
 		{
-
-			ug::script::RegisterDefaultLuaBridge(&bridge::GetUGRegistry());
-
 			LOG("****************************************************************\n");
 			LOG("* ugdocu - v0.2.0\n");
 			LOG("* arguments:\n");
