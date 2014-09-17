@@ -134,11 +134,18 @@ int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
 
 //	INIT PLUGINS
 	try{
-		if(UGInitPlugins() == false)
+#ifdef UG_PLUGINS
+		std::string path = PathProvider::get_path(PLUGIN_PATH).c_str();
+		UG_LOG("Loading Plugins from " << path << "\n");
+		if(LoadPlugins(path.c_str(), "ug4", bridge::GetUGRegistry(), true))
 		{
 			UG_ERR_LOG("Some error at Plugin initialization.\n");
 			errors |= 1;
 		}
+#else
+		UG_LOG("Not using plugins.\n (UG_PLUGINS not defined)\n");
+#endif
+
 
 	}
 	catch(UGError &err)
