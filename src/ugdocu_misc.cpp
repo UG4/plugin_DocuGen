@@ -39,7 +39,7 @@ bool IsPluginGroup(string g)
 string GetFilenameForGroup(string s, string dir)
 {
 	if(IsPluginGroup(s)) s = string("plugin.")+s.substr(9);
-	return string(dir) + ReplaceAll(s, "/", ".") + "group..html";
+	return string(dir) + ReplaceAll(s, "/", ".") + "group.html";
 }
 
 bool ClassGroupDescSort(const ClassGroupDesc *i, const ClassGroupDesc *j)
