@@ -85,87 +85,6 @@ namespace regDocu
 
 void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations, bool bSilent, ClassHierarchy &hierarchy);
 
-// int MyUGInit(int *argcp, char ***argvp, int parallelOutputProcRank=-1)
-// {
-// 	int errors = 0;
-// 	PROFILE_FUNC();
-
-// 	pcl::Init(argcp, argvp);
-// 	GetLogAssistant().set_output_process(parallelOutputProcRank);
-
-// //	INIT PATH
-// 	try{
-
-// 		if(InitPaths((*argvp)[0]) == false)
-// 		{
-// 			UG_ERR_LOG("Path Initialization failed. Expect file access problem.\n")
-// 			UG_ERR_LOG("Check environment variable UG4_ROOT.\n")
-// 			errors |= 1;
-// 		}
-// 	}
-// 	catch(UGError& err)
-// 	{
-// 	//	if ugerror is throw, an internal fatal error occured, we termiate shell
-// 		UG_ERR_LOG("UGError occurred during Path Initialization:\n");
-// 		for(size_t i=0; i<err.num_msg(); i++)
-// 			UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
-// 		errors |= 2;
-// 	}
-// 	catch(...){
-// 		UG_ERR_LOG("Unknown error received during Path Initialization.\n");
-// 		errors |= 2;
-// 	}
-
-// //	INIT STANDARD BRIDGE
-// 	try{
-// 		bridge::InitBridge();
-// 	}
-// 	catch(UGError& err)
-// 	{
-// 		UG_ERR_LOG("UGError occurred during Standard Bridge Initialization:\n");
-// 		for(size_t i=0; i<err.num_msg(); i++)
-// 			UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
-// 		errors |= 2;
-// 	}
-// 	catch(...){
-// 		UG_ERR_LOG("Unknown error received during Standard Bridge Initialization.\n");
-// 		errors |= 2;
-// 	}
-
-// //	INIT PLUGINS
-// 	try{
-// #ifdef UG_PLUGINS
-// 		std::string path = PathProvider::get_path(PLUGIN_PATH).c_str();
-// 		UG_LOG("Loading Plugins from " << path << "\n");
-// 		if(LoadPlugins(path.c_str(), "ug4", bridge::GetUGRegistry(), true) == false)
-// 		{
-// 			UG_ERR_LOG("Some error at Plugin initialization.\n");
-// 			errors |= 1;
-// 		}
-// #else
-// 		UG_LOG("Not using plugins.\n (UG_PLUGINS not defined)\n");
-// #endif
-
-
-// 	}
-// 	catch(UGError &err)
-// 	{
-// 	//	if registration of plugin fails, we do abort the shell
-// 	//	this could be skipped if registering of plugin would be done more
-// 	//	carefully. (try/catch in load plugins)
-// 		PathProvider::clear_current_path_stack();
-// 		UG_ERR_LOG("UGError occurred during Plugin Initialization:\n");
-// 		for(size_t i=0; i<err.num_msg(); i++)
-// 			UG_ERR_LOG(err.get_file(i) << ":" << err.get_line(i) << " : " << err.get_msg(i) << "\n");
-// 		errors |= 2;
-// 	}
-// 	catch(...){
-// 		UG_ERR_LOG("Unknown error received during Plugin Initialization.\n");
-// 		errors |= 2;
-// 	}
-
-// 	return errors;
-// }
 
 vector<UGDocuClassDescription> classes;
 vector<UGDocuClassDescription> classesAndGroups;
@@ -194,12 +113,6 @@ int GenerateScriptReferenceDocu(
 
 		LOG("****************************************************************\n");
 		LOG("* ugdocu - v0.2.0\n");
-		LOG("* arguments:\n");
-		LOG("*   -d       output directory for the html/c++ files\n");
-		LOG("*   -html    generate legacy HTML bridge docu\n");
-		LOG("*   -cpp     generate dummy C++ sources of registered entities\n");
-		LOG("*   -list    generate completion list\n");
-		LOG("*   -silent  don't print verbose progress info\n");
 		LOG("****************************************************************\n");
 
 
