@@ -217,7 +217,7 @@ void WriteCompletionList(std::vector<UGDocuClassDescription> &classesAndGroupsAn
 	html
 */
 
-	std::string ug4CompletionFile = PathProvider::get_path(ROOT_PATH) + "/apps/ugdocu/myUg4CompletionList.txt";
+	std::string ug4CompletionFile = PathProvider::get_path(ROOT_PATH) + "/plugins/ugdocu/myUg4CompletionList.txt";
 	Registry &reg = GetUGRegistry();
 	fstream f(ug4CompletionFile.c_str(), ios::out);
 	UG_LOG("Writing completion info to " << ug4CompletionFile << " ...\n");
