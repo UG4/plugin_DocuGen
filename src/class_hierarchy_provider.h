@@ -39,7 +39,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 using namespace std;
@@ -65,7 +65,7 @@ class ClassHierarchyProvider
 // end group apps_ugdocu
 /// \}
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug
 
 #endif	// __UG__REGDOCU__CLASS_HIERARCHY_PROVIDER_H

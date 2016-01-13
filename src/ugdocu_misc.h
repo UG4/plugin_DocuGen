@@ -38,7 +38,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 /// \addtogroup apps_ugdocu
@@ -112,7 +112,7 @@ std::string GetBeautifiedTag(std::string tag);
 // end group apps_ugdocu
 /// \}
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug
 
 #endif /* __UG__UGDOCU_MISC_H__ */

@@ -61,7 +61,7 @@ using namespace bridge;
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 /// \addtogroup apps_ugdocu
@@ -437,5 +437,5 @@ void WriteClassCompleter(ostream &classhtml, UGDocuClassDescription *d, ClassHie
 // end group apps_ugdocu
 /// \}
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug

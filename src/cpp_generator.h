@@ -47,7 +47,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 using namespace std;
@@ -316,7 +316,7 @@ class CppGenerator
 // end group apps_ugdocu
 /// \}
 
-}	// end namespace regDocu
+}	// end namespace DocuGen
 }	// end namespace ug
 
 #endif	// __UG__REGDOCU__CPP_GENERATOR_H

@@ -27,7 +27,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Lesser General Public License for more details.
 
-set(pluginName	ugdocu)
+set(pluginName	DocuGen)
 set(SOURCES
 		src/ugdocu.cpp
 		src/completion_list_generation.cpp

@@ -42,7 +42,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 /// \addtogroup apps_ugdocu
@@ -92,7 +92,7 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 		std::vector<UGDocuClassDescription> &classesAndGroupsAndImplementations );
 
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug
 
 #endif /* __UG__UGDOCUCLASSDESCRIPTION_H__ */

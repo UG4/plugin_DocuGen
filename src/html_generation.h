@@ -41,7 +41,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 /// \addtogroup apps_ugdocu
@@ -67,7 +67,7 @@ void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGD
 // end group apps_ugdocu
 /// \}
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug
 
 #endif /* __UG__HTML_GENERATION_H__ */

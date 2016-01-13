@@ -50,7 +50,7 @@ using namespace bridge;
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 extern vector<UGDocuClassDescription> classes;
@@ -161,5 +161,5 @@ string GetBeautifiedTag(string tag)
 }
 
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug

@@ -38,7 +38,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 using namespace std;
@@ -90,5 +90,5 @@ string ClassHierarchyProvider::get_group( const string class_name )
 	}
 }
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug

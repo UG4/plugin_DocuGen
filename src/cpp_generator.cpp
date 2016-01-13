@@ -48,7 +48,7 @@
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 using namespace std;

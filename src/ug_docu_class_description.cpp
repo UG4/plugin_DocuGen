@@ -39,7 +39,7 @@ using namespace bridge;
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 extern vector<UGDocuClassDescription> classes;
@@ -156,5 +156,5 @@ void GetGroups(std::vector<UGDocuClassDescription> &classes, std::vector<UGDocuC
 	}UG_CATCH_THROW_FUNC();
 }
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug

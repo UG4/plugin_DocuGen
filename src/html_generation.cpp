@@ -65,7 +65,7 @@ using namespace bridge;
 
 namespace ug
 {
-namespace regDocu
+namespace DocuGen
 {
 
 string GetClassGroup(string classname);
@@ -755,5 +755,5 @@ void WriteHTMLDocu(std::vector<UGDocuClassDescription> &classes, std::vector<UGD
 	}UG_CATCH_THROW_FUNC();
 }
 
-}	// namespace regDocu
+}	// namespace DocuGen
 }	// namespace ug

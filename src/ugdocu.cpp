@@ -75,33 +75,33 @@ extern bool IsClassInParameters(const bridge::ParameterInfo &par, const char *cl
 /**
  * \brief App for generating documentation of registered classes and methods
  */
-namespace regDocu
+namespace DocuGen
 {
 
 /**
- * \defgroup apps_ugdocu UGRegistry Documentation
- * \ingroup apps
- * \brief App for generating documentation of registered classes and methods
- * \details This app generates the documentation of all registered classes and 
+ * \defgroup UGDocu UGRegistry Documentation
+ * \ingroup plugins
+ * \brief Plugin for generating documentation of registered classes and methods
+ * \details This plugin generates the documentation of all registered classes and 
  *   methods of the linked libug4.
  *   Depending on command line parameters either HTML or C++ files are generated.
  * 
  *   <b>Usage:</b>
  *   
- *       ugdocu -d <path> [-html] [-cpp] [-list] [-silent]
+ *       ugshell -call GenerateScriptReferenceDocu\\(\\"regdocu\\", true, false, true, false\\)
  *   
  *   <b>Parameters:</b>
- *   - `-d` (required)<br />
+ *   - string outputPath<br />
  *     path of the output directory for the html, cpp files and completion list
- *   - `-html` (optional)<br />
+ *   - bool silent<br />
+ *     don't print verbose progress info, only warnings
+ *   - bool generateHTML<br />
  *     generates legacy HTML docu
- *   - `-cpp` (optional)<br />
+ *   - bool generateCPP<br />
  *     generates dummy C++ code from registered functions ready to be parsed
  *     by Doxygen
- *   - `-list` (optional)<br />
+ *   - bool generateList<br />
  *     generates completion list
- *   - `-silent` (optional)<br />
- *     don't print verbose progress info; only warnings
  * \{
  */
 
@@ -115,9 +115,9 @@ vector<UGDocuClassDescription> classesAndGroupsAndImplementations;
 // end group apps_ugdocu
 /// \}
 
-}	// namespace regDocu
+}	// namespace DocuGen
 
-/// \addtogroup apps_ugdocu
+/// \addtogroup DocuGen
 int GenerateScriptReferenceDocu(
 		const char* baseDir,
 		bool silent,
@@ -149,7 +149,7 @@ int GenerateScriptReferenceDocu(
 		}
 
 		if ( genHtml || genList ) {
-			regDocu::GetGroups(regDocu::classes, regDocu::classesAndGroups, regDocu::classesAndGroupsAndImplementations);
+			DocuGen::GetGroups(DocuGen::classes, DocuGen::classesAndGroups, DocuGen::classesAndGroupsAndImplementations);
 		}
 
 		Registry &reg = GetUGRegistry();
@@ -175,19 +175,19 @@ int GenerateScriptReferenceDocu(
 		if ( genHtml ) {
 			// Write HTML docu
 			LOG("Writing html files to \"" << dir << "\"" << endl);
-			regDocu::WriteHTMLDocu(regDocu::classes, regDocu::classesAndGroups, dir.c_str(), hierarchy);
+			DocuGen::WriteHTMLDocu(DocuGen::classes, DocuGen::classesAndGroups, dir.c_str(), hierarchy);
 		}
 
 		if ( genCpp ) {
-			regDocu::ClassHierarchyProvider chp;
+			DocuGen::ClassHierarchyProvider chp;
 			chp.init( reg );
 			// Write C++ files
-			regDocu::CppGenerator cppgen( dir, chp, silent );
+			DocuGen::CppGenerator cppgen( dir, chp, silent );
 			cppgen.generate_cpp_files();
 		}
 
 		if ( genList ) {
-			regDocu::WriteCompletionList(regDocu::classesAndGroupsAndImplementations, silent, hierarchy);
+			DocuGen::WriteCompletionList(DocuGen::classesAndGroupsAndImplementations, silent, hierarchy);
 		}
 
 	}
@@ -221,9 +221,9 @@ int GenerateScriptReferenceDocu(
 }
 
 extern "C" void
-InitUGPlugin_ugdocu(Registry* reg, string grp)
+InitUGPlugin_DocuGen(Registry* reg, string grp)
 {
-	grp.append("/ugdocu");
+	grp.append("/DocuGen");
 	reg->add_function (	"GenerateScriptReferenceDocu",
 						&GenerateScriptReferenceDocu,
 						grp,
