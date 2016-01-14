@@ -559,5 +559,5 @@ string CppGenerator::write_group_namespaces( vector<string> group_hierarchy, boo
 	return closing.str();
 }
 
-}	// end namespace ugdocu
+}	// end namespace DocuGen
 }	// end namespace ug
