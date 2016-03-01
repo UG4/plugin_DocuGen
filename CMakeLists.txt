@@ -45,6 +45,20 @@ cmake_minimum_required(VERSION 2.6)
 
 project(UG_PLUGIN_${pluginName})
 
+option(BUILD_COMPLETION "If enabled, every build builds a new completion file for ugIDE" OFF)
+message(STATUS "")
+message(STATUS "Info: ${pluginName} options:")
+message(STATUS "    * BUILD_COMPLETION:    ${BUILD_COMPLETION} (options are: ON, OFF)")
+
+if(BUILD_COMPLETION)
+	add_custom_target(buildCompletionList ALL )
+	add_custom_command(TARGET buildCompletionList
+						 PRE_BUILD
+						 COMMAND "${UG_ROOT_PATH}/bin/ugshell" -noterm -call GenerateScriptReferenceDocu\\\(\\\"\\\", true, false, false, true\\\)
+						 WORKING_DIRECTORY ${UG_ROOT_PATH}/bin)
+	add_dependencies(buildCompletionList ${TARGET} ug4)
+endif(BUILD_COMPLETION)
+
 # include the definitions and dependencies for ug-plugins.
 include(${UG_ROOT_CMAKE_PATH}/ug_plugin_includes.cmake)
 
