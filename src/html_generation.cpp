@@ -644,8 +644,8 @@ void WriteGroups(const char *dir, std::vector<UGDocuClassDescription> &classesAn
 			vstr.push_back(FunctionInfoHTML(*e, g.c_str()));
 		}
 		remove_doubles(vstr);
-		for(vector<string>::iterator it = vstr.begin(); it != vstr.end(); ++it)
-			ss << *it;
+		for(vector<string>::iterator strit = vstr.begin(); strit != vstr.end(); ++strit)
+			ss << *strit;
 		ss << "</table>";
 
 		fstream f(GetFilenameForGroup(g, dir).c_str(), ios::out);
